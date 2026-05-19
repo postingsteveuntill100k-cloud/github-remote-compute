@@ -1,0 +1,11 @@
+name: Remote Compute Environment
+on: 
+  workflow_dispatch: # Allows manual triggering via CLI
+jobs:
+  compute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup secure SSH tunnel
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
