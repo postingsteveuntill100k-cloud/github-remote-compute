@@ -1,0 +1,29 @@
+{
+  "name": "Ubuntu Desktop Codespace",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/desktop-lite:1": {
+      "password": "codespaces"
+    }
+  },
+  "forwardPorts": [
+    6080,
+    5901
+  ],
+  "portsAttributes": {
+    "6080": {
+      "label": "Web UI (noVNC)",
+      "requireLocalPort": true
+    },
+    "5901": {
+      "label": "VNC Desktop",
+      "requireLocalPort": true
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      "extensions": []
+    }
+  }
+}
