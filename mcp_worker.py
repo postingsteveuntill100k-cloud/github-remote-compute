@@ -1,43 +1,55 @@
 import asyncio
 import os
 import sys
+import httpx
 from mcp import ClientSession
-from mcp.client.sse import sse_client
+
+# A simple custom HTTP client transport since the server only uses POST
+class HTTPPostClient:
+    def __init__(self, url):
+        self.url = url
+        self.client = httpx.AsyncClient()
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.client.aclose()
+
+    async def send(self, message):
+        response = await self.client.post(self.url, json=message)
+        response.raise_for_status()
+        return response.json()
 
 async def main():
-    # Allow the GCP server IP/URL to be passed in securely via GitHub Secrets/env variables
     gcp_mcp_url = os.environ.get("GCP_MCP_URL")
 
     if not gcp_mcp_url:
         print("Error: GCP_MCP_URL environment variable is missing.", file=sys.stderr)
-        print("Expected format: http://<gcp-ip>:8000/sse", file=sys.stderr)
         sys.exit(1)
 
-    print(f"Attempting to connect to MCP server at {gcp_mcp_url}...")
+    print(f"Attempting to connect to MCP server via POST at {gcp_mcp_url}...")
 
-    # Connect to the GCP MCP server using SSE
-    async with sse_client(gcp_mcp_url) as (read_stream, write_stream):
-        async with ClientSession(read_stream, write_stream) as session:
-            # Initialize the connection
-            await session.initialize()
-            print("Successfully connected to the GCP MCP server!")
+    # For servers that only accept POST requests, we send JSON-RPC manually or via a custom transport
+    async with httpx.AsyncClient() as client:
+        # Construct a standard JSON-RPC 2.0 payload to initialize or list tools
+        payload = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "tools/list",
+            "params": {}
+        }
 
-            # Fetch available tools
-            tools_response = await session.list_tools()
-            tools = tools_response.tools
+        try:
+            response = await client.post(gcp_mcp_url, json=payload)
+            response.raise_for_status()
 
-            print("\nAvailable tools on GCP MCP:")
-            for tool in tools:
-                print(f"- {tool.name}: {tool.description}")
+            data = response.json()
+            print("Successfully communicated with the GCP MCP server!")
+            print("Response:", data)
 
-            # Example: You can now call the tools provided by the GCP server.
-            # Example call for DuckDuckGo (Assuming tool is named 'duckduckgo_search')
-            # result = await session.call_tool("duckduckgo_search", {"query": "GitHub Actions MCP"})
-            # print(result)
-
-            # Keep the runner alive to do whatever heavy lifting is needed
-            print("\nRunner initialized and ready for work.")
-            # Add your heavy computation / video rendering logic here!
+        except Exception as e:
+            print(f"Failed to communicate with server: {e}", file=sys.stderr)
 
 if __name__ == "__main__":
     asyncio.run(main())
