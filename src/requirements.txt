@@ -1,0 +1,7 @@
+python-dotenv
+sqlite3 # built-in but just in case
+moviepy
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+requests
