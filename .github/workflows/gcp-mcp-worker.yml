@@ -1,0 +1,35 @@
+name: GCP MCP Worker
+
+on:
+  workflow_dispatch:
+    inputs:
+      gcp_mcp_url:
+        description: 'The HTTP SSE URL of the GCP MCP server (e.g., http://1.2.3.4:8000/sse)'
+        required: true
+        type: string
+
+jobs:
+  run-mcp-worker:
+    runs-on: ubuntu-latest
+
+    # Prevent infinite loops if accidentally triggered by a bot
+    if: github.actor != 'github-actions[bot]'
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install mcp
+
+      - name: Run MCP Worker Script
+        env:
+          GCP_MCP_URL: ${{ inputs.gcp_mcp_url }}
+        run: python mcp_worker.py
