@@ -109,7 +109,7 @@ class AutoYTPipeline:
         response = await self.ollama_client.chat(
             model=model_name,
             messages=messages,
-            tools=self.mcp_tools if model_name == "qwen-coder-agent" else None
+            tools=self.mcp_tools if model_name == "qwen2.5-coder:1.5b" else None
         )
 
         if "tool_calls" in response['message'] and response['message']['tool_calls']:
@@ -132,10 +132,10 @@ class AutoYTPipeline:
             return await self.gemini.generate_content(payload)
 
         elif task_type == "code":
-            return await self.run_local_model("qwen-coder-agent", payload)
+            return await self.run_local_model("qwen2.5-coder:1.5b", payload)
 
         elif task_type == "vision":
-            return await self.run_local_model("qwen2.5-8k", payload)
+            return await self.run_local_model("qwen3.5:0.8b", payload)
 
         else:
             raise ValueError(f"Unknown task type: {task_type}")
