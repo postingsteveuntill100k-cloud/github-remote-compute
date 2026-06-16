@@ -132,7 +132,12 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
                 return [types.TextContent(type="text", text=f"Error: Local file not found: {local_path}")]
 
             file_metadata = {'name': drive_filename}
-            media = MediaIoBaseUpload(io.FileIO(local_path, 'rb'), resumable=True)
+            import mimetypes
+            mime_type, _ = mimetypes.guess_type(local_path)
+            if mime_type is None:
+                mime_type = 'application/octet-stream'
+
+            media = MediaIoBaseUpload(io.FileIO(local_path, 'rb'), mimetype=mime_type, resumable=True)
 
             file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
             return [types.TextContent(type="text", text=f"File uploaded successfully. File ID: {file.get('id')}")]
