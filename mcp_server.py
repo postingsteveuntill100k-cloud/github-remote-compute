@@ -1797,9 +1797,9 @@ async def run_sandbox_command(request: Request):
 
 | Viewer Segment | Q2 Retention | Risk Score | Suggested Action |
 | :--- | :--- | :--- | :--- |
-| High-Value Subs | 89% | Low | N/A |
-| Mid-Tier Watchers | 64% | Medium | Send Engagement Email |
-| Casual Scrollers | 22% | **High** | Retargeting Campaign |
+| High-Value Subs | 89% | <span class="badge badge-low">Low</span> | N/A |
+| Mid-Tier Watchers | 64% | <span class="badge badge-medium">Medium</span> | Send Engagement Email |
+| Casual Scrollers | 22% | <span class="badge badge-high">High</span> | Retargeting Campaign |
 
 **System Log Trace:**
 ```

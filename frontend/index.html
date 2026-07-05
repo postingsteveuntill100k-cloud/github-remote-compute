@@ -198,18 +198,24 @@
                 <!-- Isolated Data Preview Grid -->
                 <div class="mb-6 glass-panel border border-white/10 rounded-2xl p-6 relative overflow-hidden z-10 hidden" id="data-grid-container">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-emerald-500"></div>
-                    <h4 class="text-[11px] font-bold text-slate-200 uppercase tracking-widest mb-5 flex items-center gap-2 drop-shadow-sm">
-                        <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                        Isolated Data Preview Grid
-                    </h4>
+                    <div class="flex items-center justify-between mb-5">
+                        <h4 class="text-[11px] font-bold text-slate-200 uppercase tracking-widest flex items-center gap-2 drop-shadow-sm">
+                            <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                            Isolated Data Preview Grid
+                        </h4>
+                        <button id="btn-export-csv" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-300 hover:text-cyan-200 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Export CSV
+                        </button>
+                    </div>
                     <div class="overflow-x-auto custom-scrollbar rounded-xl border border-white/5 bg-black/40 shadow-inner">
                         <table class="w-full text-left text-sm text-slate-300">
                             <thead class="text-[10px] font-bold uppercase tracking-widest bg-black/60 text-slate-400 border-b border-white/5">
                                 <tr>
-                                    <th class="px-5 py-4">User_ID</th>
-                                    <th class="px-5 py-4">Platform</th>
-                                    <th class="px-5 py-4">Retention_Rate</th>
-                                    <th class="px-5 py-4 text-right">Revenue ($)</th>
+                                    <th class="px-5 py-4 sortable-header" data-sort="User_ID">User_ID</th>
+                                    <th class="px-5 py-4 sortable-header" data-sort="Platform">Platform</th>
+                                    <th class="px-5 py-4 sortable-header" data-sort="Retention_Rate">Retention_Rate</th>
+                                    <th class="px-5 py-4 text-right sortable-header" data-sort="Revenue">Revenue ($)</th>
                                 </tr>
                             </thead>
                             <tbody id="data-grid-body" class="divide-y divide-white/5">

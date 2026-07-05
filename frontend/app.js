@@ -23,6 +23,8 @@
         toggleViewText: document.getElementById("toggle-view-text"),
         dataGridContainer: document.getElementById("data-grid-container"),
         dataGridBody: document.getElementById("data-grid-body"),
+        btnExportCsv: document.getElementById("btn-export-csv"),
+        sortableHeaders: document.querySelectorAll(".sortable-header"),
 
         filterDate: document.getElementById("filter-date"),
         filterSegment: document.getElementById("filter-segment"),
@@ -38,6 +40,8 @@
     let trendChart = null;
     let revenueChart = null;
     let trafficChart = null;
+    let gridData = [];
+    let currentSort = { column: null, direction: 'asc' };
 
     // ----- VIEW TOGGLE -----
     if(DOM.btnToggleView) {
@@ -199,8 +203,48 @@
         }
     }
 
+    // ----- TELEMETRY SPIKES -----
+    let spikeInterval = null;
+    function startTelemetrySpike() {
+        if(DOM.headerCpu) {
+            DOM.headerCpu.classList.add("text-red-400", "drop-shadow-[0_0_8px_rgba(248,113,113,0.8)]");
+            DOM.headerCpu.classList.remove("text-cyan-200");
+            DOM.headerCpu.previousElementSibling.classList.replace("bg-cyan-500", "bg-red-500");
+            DOM.headerCpu.previousElementSibling.classList.replace("shadow-[0_0_6px_rgba(6,182,212,0.8)]", "shadow-[0_0_6px_rgba(248,113,113,0.8)]");
+        }
+        if(DOM.headerRam) {
+            DOM.headerRam.classList.add("text-orange-400", "drop-shadow-[0_0_8px_rgba(251,146,60,0.8)]");
+            DOM.headerRam.classList.remove("text-purple-200");
+            DOM.headerRam.previousElementSibling.classList.replace("bg-purple-500", "bg-orange-500");
+            DOM.headerRam.previousElementSibling.classList.replace("shadow-[0_0_6px_rgba(168,85,247,0.8)]", "shadow-[0_0_6px_rgba(251,146,60,0.8)]");
+        }
+
+        spikeInterval = setInterval(() => {
+            if(DOM.headerCpu) DOM.headerCpu.textContent = `Compute: ${Math.floor(Math.random() * 15 + 85)}%`;
+            if(DOM.headerRam) DOM.headerRam.textContent = `Mem: ${Math.floor(Math.random() * 150 + 800)}MB`;
+        }, 300);
+    }
+
+    function stopTelemetrySpike() {
+        if(spikeInterval) { clearInterval(spikeInterval); spikeInterval = null; }
+        if(DOM.headerCpu) {
+            DOM.headerCpu.classList.remove("text-red-400", "drop-shadow-[0_0_8px_rgba(248,113,113,0.8)]");
+            DOM.headerCpu.classList.add("text-cyan-200");
+            DOM.headerCpu.previousElementSibling.classList.replace("bg-red-500", "bg-cyan-500");
+            DOM.headerCpu.previousElementSibling.classList.replace("shadow-[0_0_6px_rgba(248,113,113,0.8)]", "shadow-[0_0_6px_rgba(6,182,212,0.8)]");
+        }
+        if(DOM.headerRam) {
+            DOM.headerRam.classList.remove("text-orange-400", "drop-shadow-[0_0_8px_rgba(251,146,60,0.8)]");
+            DOM.headerRam.classList.add("text-purple-200");
+            DOM.headerRam.previousElementSibling.classList.replace("bg-orange-500", "bg-purple-500");
+            DOM.headerRam.previousElementSibling.classList.replace("shadow-[0_0_6px_rgba(251,146,60,0.8)]", "shadow-[0_0_6px_rgba(168,85,247,0.8)]");
+        }
+        pollTelemetry(); // force refresh normal status
+    }
+
     // ----- SKELETON LOADER -----
     function showSkeletonLoader() {
+        startTelemetrySpike();
         if(!DOM.chatHistory) return null;
         const msgDiv = document.createElement("div");
         msgDiv.className = "chat-message agent-message relative z-10 fade-in";
@@ -225,6 +269,7 @@
     }
 
     function removeSkeletonLoader() {
+        stopTelemetrySpike();
         const loader = document.getElementById("chat-skeleton-loader");
         if(loader) loader.remove();
     }
@@ -331,6 +376,61 @@
     }
 
     // ----- UPLOAD DB FILE & PREVIEW GRID -----
+    function sortGridData(column) {
+        if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = column;
+            currentSort.direction = 'asc';
+        }
+
+        gridData.sort((a, b) => {
+            let valA = a[column];
+            let valB = b[column];
+
+            // Basic numeric parsing
+            if (!isNaN(parseFloat(valA))) valA = parseFloat(valA);
+            if (!isNaN(parseFloat(valB))) valB = parseFloat(valB);
+
+            if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+            if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        // Update header classes
+        DOM.sortableHeaders.forEach(th => {
+            th.classList.remove('asc', 'desc');
+            if (th.dataset.sort === column) {
+                th.classList.add(currentSort.direction);
+            }
+        });
+
+        renderPreviewGrid(gridData);
+    }
+
+    if(DOM.sortableHeaders) {
+        DOM.sortableHeaders.forEach(th => {
+            th.onclick = () => sortGridData(th.dataset.sort);
+        });
+    }
+
+    if(DOM.btnExportCsv) {
+        DOM.btnExportCsv.onclick = () => {
+            if(!gridData.length) return;
+            const headers = Object.keys(gridData[0]).join(",");
+            const rows = gridData.map(obj => Object.values(obj).join(",")).join("\n");
+            const csvContent = headers + "\n" + rows;
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "data_export.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+    }
+
     function renderPreviewGrid(rows) {
         if(!DOM.dataGridContainer || !DOM.dataGridBody) return;
         DOM.dataGridBody.innerHTML = "";
@@ -387,7 +487,8 @@
                     }
 
                     if(data.preview_data && Array.isArray(data.preview_data)) {
-                        renderPreviewGrid(data.preview_data);
+                        gridData = data.preview_data;
+                        renderPreviewGrid(gridData);
                     }
 
                     appendChat("system", `**Dataset Uploaded:** \`${file.name}\` successfully ingested into the secure analytics sandbox. Sample isolated data grid populated below charts.`);
@@ -413,23 +514,50 @@
             ? `<div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0 text-white shadow-lg"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>`
             : `<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.4)] border border-white/10"><svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></div>`;
 
-        let htmlContent = text;
-        if(window.marked) {
-            htmlContent = marked.parse(text);
+        let innerContainer = document.createElement("div");
+        if(role === "user") {
+            innerContainer.className = "flex-1 text-slate-200 text-[13px] leading-relaxed pt-2";
+            innerContainer.innerHTML = window.marked ? marked.parse(text) : text;
+        } else {
+            innerContainer.className = "flex-1 text-slate-300 text-[13px] leading-relaxed glass-panel p-4 rounded-2xl rounded-tl-sm border border-white/5 shadow-md";
         }
 
-        let innerContainer = role === "user"
-            ? `<div class="flex-1 text-slate-200 text-[13px] leading-relaxed pt-2">${htmlContent}</div>`
-            : `<div class="flex-1 text-slate-300 text-[13px] leading-relaxed glass-panel p-4 rounded-2xl rounded-tl-sm border border-white/5 shadow-md">${htmlContent}</div>`;
-
-        msgDiv.innerHTML = `<div class="flex gap-5 max-w-5xl mx-auto">${avatarHTML}${innerContainer}</div>`;
+        const flexWrapper = document.createElement("div");
+        flexWrapper.className = "flex gap-5 max-w-5xl mx-auto";
+        flexWrapper.innerHTML = avatarHTML;
+        flexWrapper.appendChild(innerContainer);
+        msgDiv.appendChild(flexWrapper);
         DOM.chatHistory.appendChild(msgDiv);
-        DOM.chatHistory.scrollTop = DOM.chatHistory.scrollHeight;
 
-        if(window.hljs) {
-            msgDiv.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightElement(block);
-            });
+        if (role !== "user") {
+            // Streaming effect
+            let i = 0;
+            const speed = 5; // ms per char
+            function typeWriter() {
+                if (i < text.length) {
+                    i += Math.floor(Math.random() * 3) + 1; // chunk size
+                    const chunk = text.substring(0, i);
+                    innerContainer.innerHTML = window.marked ? marked.parse(chunk) : chunk;
+                    DOM.chatHistory.scrollTop = DOM.chatHistory.scrollHeight;
+                    setTimeout(typeWriter, speed);
+                } else {
+                    innerContainer.innerHTML = window.marked ? marked.parse(text) : text;
+                    if(window.hljs) {
+                        msgDiv.querySelectorAll('pre code').forEach((block) => {
+                            hljs.highlightElement(block);
+                        });
+                    }
+                    DOM.chatHistory.scrollTop = DOM.chatHistory.scrollHeight;
+                }
+            }
+            typeWriter();
+        } else {
+            DOM.chatHistory.scrollTop = DOM.chatHistory.scrollHeight;
+            if(window.hljs) {
+                msgDiv.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+            }
         }
     }
 

@@ -144,3 +144,61 @@
 .message-content tr:hover td {
     background: rgba(255,255,255,0.04);
 }
+
+/* Markdown Pill Badges */
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1;
+}
+.badge-low {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
+}
+.badge-medium {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+}
+.badge-high {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
+}
+
+/* Sortable Headers */
+.sortable-header {
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    transition: background-color 0.2s;
+}
+.sortable-header:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+.sortable-header::after {
+    content: '⇅';
+    position: absolute;
+    right: 6px;
+    opacity: 0.3;
+    font-size: 0.7em;
+}
+.sortable-header.asc::after {
+    content: '↑';
+    opacity: 0.8;
+    color: #38bdf8;
+}
+.sortable-header.desc::after {
+    content: '↓';
+    opacity: 0.8;
+    color: #38bdf8;
+}
