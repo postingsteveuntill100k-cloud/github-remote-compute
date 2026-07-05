@@ -1,4 +1,8 @@
-(function() {
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
     const DOM = {
         authGate: document.getElementById("auth-gate"),
         appShell: document.getElementById("app-shell"),
@@ -287,20 +291,22 @@
 
     // ----- LIVE FIREBASE AUTHENTICATION -----
     const firebaseConfig = {
-        apiKey: "AIzaSy_YOUR_API_KEY_HERE",
-        authDomain: "your-project-id.firebaseapp.com",
-        projectId: "your-project-id",
-        storageBucket: "your-project-id.appspot.com",
-        messagingSenderId: "1234567890",
-        appId: "1:1234567890:web:abcdef123456"
+        apiKey: "AIzaSyDYG2wkluDX0pqRTBuufu6QmFXb4i4TBpk",
+        authDomain: "mcpsuper-servers.firebaseapp.com",
+        projectId: "mcpsuper-servers",
+        storageBucket: "mcpsuper-servers.firebasestorage.app",
+        messagingSenderId: "214677923673",
+        appId: "1:214677923673:web:75e45d40a510abab6d8e48",
+        measurementId: "G-P409QBP5QJ"
     };
 
-    function initFirebaseAuth() {
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
 
-        firebase.auth().onAuthStateChanged(async (user) => {
+    function initFirebaseAuth() {
+
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 idToken = await user.getIdToken();
                 isSignedIn = true;
@@ -316,7 +322,7 @@
                 const email = DOM.inputEmail.value;
                 const password = document.getElementById("input-password").value;
                 try {
-                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                    await signInWithEmailAndPassword(auth, email, password);
                 } catch (error) {
                     const authError = document.getElementById("auth-error");
                     authError.textContent = error.message;
@@ -329,7 +335,7 @@
                 const email = DOM.inputEmail.value;
                 const password = document.getElementById("input-password").value;
                 try {
-                    await firebase.auth().createUserWithEmailAndPassword(email, password);
+                    await createUserWithEmailAndPassword(auth, email, password);
                 } catch (error) {
                     const authError = document.getElementById("auth-error");
                     authError.textContent = error.message;
@@ -340,8 +346,8 @@
         if(DOM.btnGoogleLogin) {
             DOM.btnGoogleLogin.onclick = async () => {
                 try {
-                    const provider = new firebase.auth.GoogleAuthProvider();
-                    await firebase.auth().signInWithPopup(provider);
+                    const provider = new GoogleAuthProvider();
+                    await signInWithPopup(auth, provider);
                 } catch (error) {
                     const authError = document.getElementById("auth-error");
                     authError.textContent = error.message;
@@ -351,301 +357,9 @@
         }
         if(DOM.btnLogout) {
             DOM.btnLogout.onclick = () => {
-                firebase.auth().signOut();
+                signOut(auth);
             };
         }
     }
 
-    function enterApp(user) {
-        DOM.authGate.classList.add("hidden");
-        DOM.appShell.classList.remove("hidden");
-        setTimeout(() => DOM.appShell.classList.remove("opacity-0"), 50);
-
-        if(DOM.userName) DOM.userName.textContent = user.displayName || user.email.split("@")[0];
-        if(DOM.userAvatar) DOM.userAvatar.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' rx='18' fill='%236366f1'/></svg>";
-
-        initCharts();
-        connectWebSocket();
-        pollTelemetry();
-    }
-
-    function exitApp() {
-        isSignedIn = false;
-        idToken = null;
-        DOM.appShell.classList.add("opacity-0");
-        setTimeout(() => {
-            DOM.appShell.classList.add("hidden");
-            DOM.authGate.classList.remove("hidden");
-        }, 700);
-        if(ws) { ws.close(); ws = null; }
-    }
-
-    // ----- TELEMETRY -----
-    async function pollTelemetry() {
-        if(!isSignedIn) return;
-        try {
-            const res = await fetch("/api/v1/system/telemetry", { headers: { "Authorization": `Bearer ${idToken}` } });
-            if(res.ok) {
-                const tel = await res.json();
-                if(DOM.headerCpu) DOM.headerCpu.textContent = `Compute: ${tel.system_cpu_load || 0}%`;
-                const mem = (tel.system_memory_total || 0) - (tel.system_memory_available || 0);
-                if(DOM.headerRam) DOM.headerRam.textContent = `Mem: ${Math.round(mem / 1024 / 1024)}MB`;
-            }
-        } catch(e) {}
-        setTimeout(pollTelemetry, 5000);
-    }
-
-    // ----- CHAT INPUT & SEND -----
-    if(DOM.chatInput) {
-        DOM.chatInput.addEventListener('input', function() {
-            this.style.height = "24px";
-            this.style.height = `${Math.min(this.scrollHeight, 200)}px`;
-        });
-        DOM.chatInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                DOM.btnSendChat.click();
-            }
-        });
-    }
-
-    if(DOM.btnSendChat) {
-        DOM.btnSendChat.onclick = async () => {
-            const text = DOM.chatInput.value.trim();
-            if (!text) return;
-            appendChat("user", text);
-            DOM.chatInput.value = "";
-            DOM.chatInput.style.height = "24px";
-
-            highlightChartIntent(text);
-            showSkeletonLoader();
-
-            try {
-                const res = await fetch("/api/sandbox/run", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
-                    body: JSON.stringify({ command: text })
-                });
-                const data = await res.json();
-                removeSkeletonLoader();
-                if(data.output) {
-                    appendChat("system", data.output);
-                    if(data.chart_metrics) {
-                        animateChartUpdates({ charts: data.chart_metrics });
-                    } else {
-                        animateChartUpdates();
-                    }
-                }
-            } catch(e) {
-                removeSkeletonLoader();
-                appendChat("system", `Error: ${e.message}`);
-            }
-        };
-    }
-
-    // ----- UPLOAD DB FILE & PREVIEW GRID -----
-    function sortGridData(column) {
-        if (currentSort.column === column) {
-            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-        } else {
-            currentSort.column = column;
-            currentSort.direction = 'asc';
-        }
-
-        gridData.sort((a, b) => {
-            let valA = a[column];
-            let valB = b[column];
-
-            // Basic numeric parsing
-            if (!isNaN(parseFloat(valA))) valA = parseFloat(valA);
-            if (!isNaN(parseFloat(valB))) valB = parseFloat(valB);
-
-            if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
-            if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
-            return 0;
-        });
-
-        // Update header classes
-        DOM.sortableHeaders.forEach(th => {
-            th.classList.remove('asc', 'desc');
-            if (th.dataset.sort === column) {
-                th.classList.add(currentSort.direction);
-            }
-        });
-
-        renderPreviewGrid(gridData);
-    }
-
-    if(DOM.sortableHeaders) {
-        DOM.sortableHeaders.forEach(th => {
-            th.onclick = () => sortGridData(th.dataset.sort);
-        });
-    }
-
-    if(DOM.btnExportCsv) {
-        DOM.btnExportCsv.onclick = () => {
-            if(!gridData.length) return;
-            const headers = Object.keys(gridData[0]).join(",");
-            const rows = gridData.map(obj => Object.values(obj).join(",")).join("\n");
-            const csvContent = headers + "\n" + rows;
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", "data_export.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        };
-    }
-
-    function renderPreviewGrid(rows) {
-        if(!DOM.dataGridContainer || !DOM.dataGridBody) return;
-        DOM.dataGridBody.innerHTML = "";
-        rows.forEach(row => {
-            const tr = document.createElement("tr");
-            tr.className = "hover:bg-white/5 transition-colors";
-            tr.innerHTML = `
-                <td class="px-5 py-3 border-r border-white/5 font-mono text-[11px] text-slate-400">${row.User_ID || "-"}</td>
-                <td class="px-5 py-3 border-r border-white/5 text-cyan-300 text-[13px] font-medium">${row.Platform || "-"}</td>
-                <td class="px-5 py-3 border-r border-white/5">
-                    <div class="flex items-center gap-3">
-                        <div class="w-20 h-1.5 bg-black/60 rounded-full overflow-hidden shadow-inner">
-                            <div class="h-full rounded-full transition-all duration-1000 ${parseFloat(row.Retention_Rate) > 50 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'}" style="width: ${row.Retention_Rate}%"></div>
-                        </div>
-                        <span class="text-xs text-slate-300 font-mono">${row.Retention_Rate}%</span>
-                    </div>
-                </td>
-                <td class="px-5 py-3 text-right font-mono text-emerald-400 text-sm">$${parseFloat(row.Revenue).toFixed(2) || "0.00"}</td>
-            `;
-            DOM.dataGridBody.appendChild(tr);
-        });
-
-        DOM.dataGridContainer.classList.remove("hidden");
-        DOM.dataGridContainer.classList.add("fade-in");
-    }
-
-    if(DOM.btnUploadDb) {
-        DOM.btnUploadDb.onclick = async () => {
-            const file = DOM.dbFile.files[0];
-            if (!file) {
-                alert("Please select a file first.");
-                return;
-            }
-
-            DOM.btnUploadDb.textContent = "Uploading...";
-            const formData = new FormData();
-            formData.append("file", file);
-
-            try {
-                const res = await fetch("/api/sandbox/upload", {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${idToken}` },
-                    body: formData
-                });
-
-                if(res.ok) {
-                    const data = await res.json();
-                    DOM.btnUploadDb.textContent = "Uploaded!";
-
-                    if(DOM.headerStatus) DOM.headerStatus.textContent = "Database Connected";
-                    if(DOM.headerStatusContainer) {
-                        DOM.headerStatusContainer.classList.remove("bg-emerald-500/10", "border-emerald-500/30", "text-emerald-400");
-                        DOM.headerStatusContainer.classList.add("bg-cyan-500/10", "border-cyan-500/40", "text-cyan-400", "shadow-[0_0_15px_rgba(6,182,212,0.3)]");
-                    }
-
-                    if(data.preview_data && Array.isArray(data.preview_data)) {
-                        gridData = data.preview_data;
-                        renderPreviewGrid(gridData);
-                    }
-
-                    appendChat("system", `**Dataset Uploaded:** \`${file.name}\` successfully ingested into the secure analytics sandbox. Sample isolated data grid populated below charts.`);
-                    setTimeout(() => DOM.btnUploadDb.textContent = "Upload to Sandbox", 3000);
-                } else {
-                    throw new Error("Upload failed");
-                }
-            } catch(e) {
-                DOM.btnUploadDb.textContent = "Error";
-                setTimeout(() => DOM.btnUploadDb.textContent = "Upload to Sandbox", 2000);
-                appendChat("system", `**Error:** Failed to upload \`${file.name}\`. ${e.message}`);
-            }
-        };
-    }
-
-    // ----- CHAT RENDERER -----
-    function appendChat(role, text) {
-        if(!DOM.chatHistory) return;
-        const msgDiv = document.createElement("div");
-        msgDiv.className = `chat-message fade-in relative z-10 ${role === "user" ? "" : "agent-message"}`;
-
-        let avatarHTML = role === "user"
-            ? `<div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0 text-white shadow-lg"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>`
-            : `<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.4)] border border-white/10"><svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></div>`;
-
-        let innerContainer = document.createElement("div");
-        if(role === "user") {
-            innerContainer.className = "flex-1 text-slate-200 text-[13px] leading-relaxed pt-2";
-            innerContainer.innerHTML = window.marked ? marked.parse(text) : text;
-        } else {
-            innerContainer.className = "flex-1 text-slate-300 text-[13px] leading-relaxed glass-panel p-4 rounded-2xl rounded-tl-sm border border-white/5 shadow-md";
-        }
-
-        const flexWrapper = document.createElement("div");
-        flexWrapper.className = "flex gap-5 max-w-5xl mx-auto";
-        flexWrapper.innerHTML = avatarHTML;
-        flexWrapper.appendChild(innerContainer);
-        msgDiv.appendChild(flexWrapper);
-        DOM.chatHistory.appendChild(msgDiv);
-
-        if (role !== "user") {
-            // Streaming effect
-            let i = 0;
-            const speed = 5; // ms per char
-            function typeWriter() {
-                if (i < text.length) {
-                    i += Math.floor(Math.random() * 3) + 1; // chunk size
-                    const chunk = text.substring(0, i);
-                    innerContainer.innerHTML = window.marked ? marked.parse(chunk) : chunk;
-                    DOM.chatHistory.scrollTop = DOM.chatHistory.scrollHeight;
-                    setTimeout(typeWriter, speed);
-                } else {
-                    innerContainer.innerHTML = window.marked ? marked.parse(text) : text;
-                    if(window.hljs) {
-                        msgDiv.querySelectorAll('pre code').forEach((block) => {
-                            hljs.highlightElement(block);
-                        });
-                    }
-                    DOM.chatHistory.scrollTop = DOM.chatHistory.scrollHeight;
-                }
-            }
-            typeWriter();
-        } else {
-            DOM.chatHistory.scrollTop = DOM.chatHistory.scrollHeight;
-            if(window.hljs) {
-                msgDiv.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightElement(block);
-                });
-            }
-        }
-    }
-
-    // ----- WEBSOCKET -----
-    function connectWebSocket() {
-        const wsUrl = `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/api/v1/tunnels/logs/ws?token=${idToken}`;
-        ws = new WebSocket(wsUrl);
-        ws.onmessage = (event) => {
-            if(event.data === "pong") return;
-            try {
-                const entry = JSON.parse(event.data);
-                if(entry.msg && !entry.msg.includes("Telemetry") && !entry.msg.includes("Heartbeat")) {
-                     console.log("System Log: ", entry.msg);
-                }
-            } catch(e) {}
-        };
-        ws.onclose = () => {
-            if(isSignedIn) setTimeout(connectWebSocket, 3000);
-        };
-    }
-
     initFirebaseAuth();
-})();
