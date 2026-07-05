@@ -1,5 +1,13 @@
-/* Tailwind handles most styling, but we add custom scrollbars and markdown table fixes here */
+/* DataAgent Hub - Cyberpunk Glassmorphism Styling */
 
+/* Core Glass Panel Utility */
+.glass-panel {
+    background: rgba(30, 27, 46, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* Custom Scrollbars */
 .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
 }
@@ -11,12 +19,66 @@
     border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.25);
 }
 
-/* Markdown Typography */
+/* Typography and Glow Effects */
+.glow-text {
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+}
+
+/* Skeleton Loader Animation */
+.skeleton-wave {
+    background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+    background-size: 400% 100%;
+    animation: skeletonLoading 1.5s infinite ease-in-out;
+}
+@keyframes skeletonLoading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Smooth UI Transitions */
+.fade-in {
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Intent Highlighting Classes */
+.chart-panel {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.chart-highlight-revenue {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.35) !important;
+    border-color: rgba(16, 185, 129, 0.6) !important;
+    transform: translateY(-4px) scale(1.01);
+}
+.chart-highlight-traffic {
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.35) !important;
+    border-color: rgba(168, 85, 247, 0.6) !important;
+    transform: translateY(-4px) scale(1.01);
+}
+.chart-highlight-retention {
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.35) !important;
+    border-color: rgba(6, 182, 212, 0.6) !important;
+    transform: translateY(-4px) scale(1.01);
+}
+
+/* Data Preview Grid styling for smooth row animations */
+#data-grid-body tr {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#data-grid-body tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: scale(1.005) translateX(4px);
+}
+
+/* Markdown Styling (Tailored for Glassmorphism) */
 .message-content p {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.8rem;
 }
 .message-content p:last-child {
     margin-bottom: 0;
@@ -28,39 +90,39 @@
 .message-content code:not(pre code) {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.85em;
-    background: rgba(255,255,255,0.1);
-    padding: 0.1rem 0.3rem;
-    border-radius: 0.25rem;
+    background: rgba(255,255,255,0.08);
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.3rem;
     color: #38bdf8;
 }
 .message-content pre {
-    background: rgba(0,0,0,0.4) !important;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.5) !important;
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 0.75rem;
-    padding: 1rem;
+    padding: 1.25rem;
     overflow-x: auto;
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.8rem;
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
+    margin-top: 0.75rem;
+    margin-bottom: 1.25rem;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
 }
 .message-content pre code {
     background: transparent !important;
     padding: 0;
 }
 
-/* Markdown Tables tailored for glassmorphism */
+/* Markdown Tables */
 .message-content table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
+    margin-top: 0.75rem;
+    margin-bottom: 1.25rem;
     font-size: 0.8rem;
     border-radius: 0.5rem;
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.08);
     background: rgba(255,255,255,0.02);
 }
 .message-content th, .message-content td {
@@ -69,7 +131,7 @@
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 .message-content th {
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.4);
     color: #94a3b8;
     font-weight: 600;
     text-transform: uppercase;
@@ -80,28 +142,5 @@
     border-bottom: none;
 }
 .message-content tr:hover td {
-    background: rgba(255,255,255,0.03);
-}
-
-/* Smooth UI transitions */
-.fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Data Preview Grid styling for smooth row animations */
-#data-grid-body tr {
-    transition: all 0.2s ease-in-out;
-}
-#data-grid-body tr:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: scale(1.01);
-}
-
-/* Ensure chart panels transition smoothly when highlighted */
-.chart-panel {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255,255,255,0.04);
 }

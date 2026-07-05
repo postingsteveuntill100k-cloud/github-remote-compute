@@ -1,5 +1,4 @@
 (function() {
-    // Keep exact DOM bindings but expand for new elements safely
     const DOM = {
         authGate: document.getElementById("auth-gate"),
         appShell: document.getElementById("app-shell"),
@@ -15,21 +14,19 @@
         headerCpu: document.getElementById("header-cpu"),
         headerRam: document.getElementById("header-ram"),
         headerStatus: document.getElementById("header-status"),
+        headerStatusContainer: document.getElementById("header-status-container"),
         btnUploadDb: document.getElementById("btn-upload-db"),
         dbFile: document.getElementById("dbFile"),
 
-        // New elements
         sidebar: document.getElementById("main-sidebar"),
         btnToggleView: document.getElementById("btn-toggle-view"),
         toggleViewText: document.getElementById("toggle-view-text"),
         dataGridContainer: document.getElementById("data-grid-container"),
         dataGridBody: document.getElementById("data-grid-body"),
 
-        // Filters
         filterDate: document.getElementById("filter-date"),
         filterSegment: document.getElementById("filter-segment"),
 
-        // Chart panels
         chartRetention: document.getElementById("chart-container-retention"),
         chartRevenue: document.getElementById("chart-container-revenue"),
         chartTraffic: document.getElementById("chart-container-traffic"),
@@ -47,12 +44,12 @@
         DOM.btnToggleView.onclick = () => {
             const isHidden = DOM.sidebar.classList.contains("w-0");
             if (isHidden) {
-                DOM.sidebar.classList.remove("w-0", "opacity-0", "px-0");
+                DOM.sidebar.classList.remove("w-0", "opacity-0", "px-0", "border-0");
                 DOM.sidebar.classList.add("w-72");
-                DOM.toggleViewText.textContent = "View as Webpage";
+                DOM.toggleViewText.textContent = "Full Canvas";
             } else {
                 DOM.sidebar.classList.remove("w-72");
-                DOM.sidebar.classList.add("w-0", "opacity-0", "px-0");
+                DOM.sidebar.classList.add("w-0", "opacity-0", "px-0", "border-0");
                 DOM.toggleViewText.textContent = "Show Controls";
             }
         };
@@ -62,10 +59,25 @@
     function initCharts() {
         if(!window.Chart) return;
 
-        Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
+        Chart.defaults.color = 'rgba(255, 255, 255, 0.6)';
         Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+        Chart.defaults.plugins.tooltip.titleColor = '#38bdf8';
+        Chart.defaults.plugins.tooltip.bodyColor = '#f8fafc';
+        Chart.defaults.plugins.tooltip.borderColor = 'rgba(56, 189, 248, 0.3)';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.padding = 10;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+        Chart.defaults.plugins.tooltip.displayColors = false;
 
-        // 1. Retention Trend Chart (Line)
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 1200, easing: 'easeOutQuart' },
+            hover: { mode: 'nearest', intersect: true },
+            plugins: { legend: { display: false } }
+        };
+
         const trendCtx = document.getElementById('trendChart')?.getContext('2d');
         if(trendCtx) {
             trendChart = new Chart(trendCtx, {
@@ -75,20 +87,22 @@
                     datasets: [{
                         label: 'Retention %',
                         data: [45, 52, 48, 61, 59, 72],
-                        borderColor: '#0ea5e9', // cyan-500
-                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
-                        borderWidth: 2,
+                        borderColor: '#06b6d4', // cyan-500
+                        backgroundColor: 'rgba(6, 182, 212, 0.15)',
+                        borderWidth: 2.5,
                         tension: 0.4,
                         fill: true,
-                        pointBackgroundColor: '#0ea5e9',
+                        pointBackgroundColor: '#06b6d4',
                         pointBorderColor: '#fff',
-                        pointRadius: 3
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#06b6d4',
+                        pointHoverBorderWidth: 2
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    ...commonOptions,
                     scales: {
                         y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false } },
                         x: { grid: { display: false, drawBorder: false } }
@@ -97,7 +111,6 @@
             });
         }
 
-        // 2. Revenue Breakdown (Horizontal Bar)
         const revCtx = document.getElementById('revenueChart')?.getContext('2d');
         if(revCtx) {
             revenueChart = new Chart(revCtx, {
@@ -107,26 +120,24 @@
                     datasets: [{
                         label: 'Revenue ($K)',
                         data: [120, 95, 80, 60, 45],
-                        backgroundColor: 'rgba(16, 185, 129, 0.6)', // emerald-500
-                        borderColor: '#10b981',
-                        borderWidth: 1,
-                        borderRadius: 4
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)', // emerald-500
+                        hoverBackgroundColor: '#10b981',
+                        borderColor: 'transparent',
+                        borderWidth: 0,
+                        borderRadius: 6
                     }]
                 },
                 options: {
+                    ...commonOptions,
                     indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
                     scales: {
-                        x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        y: { grid: { display: false } }
+                        x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false } },
+                        y: { grid: { display: false, drawBorder: false } }
                     }
                 }
             });
         }
 
-        // 3. Traffic Distribution (Doughnut)
         const trafficCtx = document.getElementById('trafficChart')?.getContext('2d');
         if(trafficCtx) {
             trafficChart = new Chart(trafficCtx, {
@@ -135,17 +146,17 @@
                     labels: ['Organic', 'Direct', 'Referral', 'Social'],
                     datasets: [{
                         data: [40, 25, 20, 15],
-                        backgroundColor: ['#8b5cf6', '#0ea5e9', '#10b981', '#f59e0b'],
-                        borderWidth: 0,
-                        hoverOffset: 4
+                        backgroundColor: ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b'],
+                        borderWidth: 2,
+                        borderColor: '#1e1b2e',
+                        hoverOffset: 8
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    ...commonOptions,
                     cutout: '65%',
                     plugins: {
-                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } }
+                        legend: { display: true, position: 'right', labels: { boxWidth: 10, font: { size: 10, family: "'Inter', sans-serif" }, color: 'rgba(255,255,255,0.7)' } }
                     }
                 }
             });
@@ -153,7 +164,6 @@
     }
 
     function animateChartUpdates() {
-        // Coordinated animation frame for updating datasets
         if(trendChart) {
             trendChart.data.datasets[0].data = trendChart.data.datasets[0].data.map(v => Math.max(10, Math.min(100, v + (Math.random()*20 - 10))));
             trendChart.update();
@@ -169,7 +179,6 @@
         }
     }
 
-    // ----- DYNAMIC CONTENT SWITCHING -----
     if(DOM.filterDate && DOM.filterSegment) {
         DOM.filterDate.onchange = animateChartUpdates;
         DOM.filterSegment.onchange = animateChartUpdates;
@@ -177,24 +186,50 @@
 
     function highlightChartIntent(text) {
         const lower = text.toLowerCase();
+        if(DOM.chartRetention) DOM.chartRetention.classList.remove("chart-highlight-retention");
+        if(DOM.chartRevenue) DOM.chartRevenue.classList.remove("chart-highlight-revenue");
+        if(DOM.chartTraffic) DOM.chartTraffic.classList.remove("chart-highlight-traffic");
 
-        // Reset all
-        if(DOM.chartRetention) DOM.chartRetention.classList.remove("ring-2", "ring-cyan-400", "shadow-[0_0_15px_rgba(34,211,238,0.5)]", "scale-[1.02]");
-        if(DOM.chartRevenue) DOM.chartRevenue.classList.remove("ring-2", "ring-emerald-400", "shadow-[0_0_15px_rgba(16,185,129,0.5)]", "scale-[1.02]");
-        if(DOM.chartTraffic) DOM.chartTraffic.classList.remove("ring-2", "ring-purple-400", "shadow-[0_0_15px_rgba(168,85,247,0.5)]", "scale-[1.02]");
-
-        // Highlight based on intent
-        if(lower.includes("revenue") || lower.includes("money") || lower.includes("earnings")) {
-            if(DOM.chartRevenue) DOM.chartRevenue.classList.add("ring-2", "ring-emerald-400", "shadow-[0_0_15px_rgba(16,185,129,0.5)]", "scale-[1.02]");
-        } else if (lower.includes("traffic") || lower.includes("source") || lower.includes("audience")) {
-            if(DOM.chartTraffic) DOM.chartTraffic.classList.add("ring-2", "ring-purple-400", "shadow-[0_0_15px_rgba(168,85,247,0.5)]", "scale-[1.02]");
-        } else if (lower.includes("retention") || lower.includes("trend")) {
-            if(DOM.chartRetention) DOM.chartRetention.classList.add("ring-2", "ring-cyan-400", "shadow-[0_0_15px_rgba(34,211,238,0.5)]", "scale-[1.02]");
+        if(lower.includes("revenue") || lower.includes("money") || lower.includes("earnings") || lower.includes("breakdown")) {
+            if(DOM.chartRevenue) DOM.chartRevenue.classList.add("chart-highlight-revenue");
+        } else if (lower.includes("traffic") || lower.includes("source") || lower.includes("audience") || lower.includes("distribution")) {
+            if(DOM.chartTraffic) DOM.chartTraffic.classList.add("chart-highlight-traffic");
+        } else if (lower.includes("retention") || lower.includes("trend") || lower.includes("risk")) {
+            if(DOM.chartRetention) DOM.chartRetention.classList.add("chart-highlight-retention");
         }
     }
 
+    // ----- SKELETON LOADER -----
+    function showSkeletonLoader() {
+        if(!DOM.chatHistory) return null;
+        const msgDiv = document.createElement("div");
+        msgDiv.className = "chat-message agent-message relative z-10 fade-in";
+        msgDiv.id = "chat-skeleton-loader";
+        msgDiv.innerHTML = `
+            <div class="flex gap-5 max-w-5xl mx-auto">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/50 to-purple-600/50 flex items-center justify-center flex-shrink-0 border border-white/10 animate-pulse">
+                    <svg class="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                </div>
+                <div class="flex-1 glass-panel p-5 rounded-2xl rounded-tl-sm border border-white/5 shadow-md">
+                    <div class="h-3 w-48 skeleton-wave rounded-full mb-4"></div>
+                    <div class="space-y-3">
+                        <div class="h-2 w-full skeleton-wave rounded-full"></div>
+                        <div class="h-2 w-[90%] skeleton-wave rounded-full"></div>
+                        <div class="h-2 w-[60%] skeleton-wave rounded-full"></div>
+                    </div>
+                </div>
+            </div>`;
+        DOM.chatHistory.appendChild(msgDiv);
+        DOM.chatHistory.scrollTop = DOM.chatHistory.scrollHeight;
+        return msgDiv;
+    }
 
-    // ----- FIREBASE AUTH (MOCK OR REAL) -----
+    function removeSkeletonLoader() {
+        const loader = document.getElementById("chat-skeleton-loader");
+        if(loader) loader.remove();
+    }
+
+    // ----- FIREBASE AUTH (MOCK) -----
     function initMockAuth() {
         if(DOM.formEmailAuth) {
             DOM.formEmailAuth.onsubmit = (e) => {
@@ -217,8 +252,8 @@
         DOM.appShell.classList.remove("hidden");
         setTimeout(() => DOM.appShell.classList.remove("opacity-0"), 50);
 
-        DOM.userName.textContent = user.displayName || user.email.split("@")[0];
-        DOM.userAvatar.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' rx='18' fill='%236366f1'/></svg>";
+        if(DOM.userName) DOM.userName.textContent = user.displayName || user.email.split("@")[0];
+        if(DOM.userAvatar) DOM.userAvatar.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' rx='18' fill='%236366f1'/></svg>";
 
         initCharts();
         connectWebSocket();
@@ -243,9 +278,9 @@
             const res = await fetch("/api/v1/system/telemetry", { headers: { "Authorization": `Bearer ${idToken}` } });
             if(res.ok) {
                 const tel = await res.json();
-                DOM.headerCpu.textContent = `Compute: ${tel.system_cpu_load || 0}%`;
+                if(DOM.headerCpu) DOM.headerCpu.textContent = `Compute: ${tel.system_cpu_load || 0}%`;
                 const mem = (tel.system_memory_total || 0) - (tel.system_memory_available || 0);
-                DOM.headerRam.textContent = `Memory: ${Math.round(mem / 1024 / 1024)} MB`;
+                if(DOM.headerRam) DOM.headerRam.textContent = `Mem: ${Math.round(mem / 1024 / 1024)}MB`;
             }
         } catch(e) {}
         setTimeout(pollTelemetry, 5000);
@@ -257,7 +292,6 @@
             this.style.height = "24px";
             this.style.height = `${Math.min(this.scrollHeight, 200)}px`;
         });
-
         DOM.chatInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -275,6 +309,7 @@
             DOM.chatInput.style.height = "24px";
 
             highlightChartIntent(text);
+            showSkeletonLoader();
 
             try {
                 const res = await fetch("/api/sandbox/run", {
@@ -283,11 +318,13 @@
                     body: JSON.stringify({ command: text })
                 });
                 const data = await res.json();
+                removeSkeletonLoader();
                 if(data.output) {
                     appendChat("system", data.output);
-                    animateChartUpdates(); // animate charts on success
+                    animateChartUpdates();
                 }
             } catch(e) {
+                removeSkeletonLoader();
                 appendChat("system", `Error: ${e.message}`);
             }
         };
@@ -301,22 +338,21 @@
             const tr = document.createElement("tr");
             tr.className = "hover:bg-white/5 transition-colors";
             tr.innerHTML = `
-                <td class="px-4 py-3 border-r border-white/5 font-mono text-xs text-slate-400">${row.User_ID || "-"}</td>
-                <td class="px-4 py-3 border-r border-white/5 text-cyan-300">${row.Platform || "-"}</td>
-                <td class="px-4 py-3 border-r border-white/5">
-                    <div class="flex items-center gap-2">
-                        <div class="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <div class="h-full ${parseFloat(row.Retention_Rate) > 50 ? 'bg-emerald-500' : 'bg-red-500'}" style="width: ${row.Retention_Rate}%"></div>
+                <td class="px-5 py-3 border-r border-white/5 font-mono text-[11px] text-slate-400">${row.User_ID || "-"}</td>
+                <td class="px-5 py-3 border-r border-white/5 text-cyan-300 text-[13px] font-medium">${row.Platform || "-"}</td>
+                <td class="px-5 py-3 border-r border-white/5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-20 h-1.5 bg-black/60 rounded-full overflow-hidden shadow-inner">
+                            <div class="h-full rounded-full transition-all duration-1000 ${parseFloat(row.Retention_Rate) > 50 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'}" style="width: ${row.Retention_Rate}%"></div>
                         </div>
-                        <span class="text-xs text-slate-300">${row.Retention_Rate}%</span>
+                        <span class="text-xs text-slate-300 font-mono">${row.Retention_Rate}%</span>
                     </div>
                 </td>
-                <td class="px-4 py-3 text-right font-medium text-emerald-400">$${parseFloat(row.Revenue).toFixed(2) || "0.00"}</td>
+                <td class="px-5 py-3 text-right font-mono text-emerald-400 text-sm">$${parseFloat(row.Revenue).toFixed(2) || "0.00"}</td>
             `;
             DOM.dataGridBody.appendChild(tr);
         });
 
-        // Show the grid container with a smooth fade in
         DOM.dataGridContainer.classList.remove("hidden");
         DOM.dataGridContainer.classList.add("fade-in");
     }
@@ -343,9 +379,13 @@
                 if(res.ok) {
                     const data = await res.json();
                     DOM.btnUploadDb.textContent = "Uploaded!";
-                    DOM.headerStatus.textContent = "Database Connected";
 
-                    // Render preview grid if backend sent data
+                    if(DOM.headerStatus) DOM.headerStatus.textContent = "Database Connected";
+                    if(DOM.headerStatusContainer) {
+                        DOM.headerStatusContainer.classList.remove("bg-emerald-500/10", "border-emerald-500/30", "text-emerald-400");
+                        DOM.headerStatusContainer.classList.add("bg-cyan-500/10", "border-cyan-500/40", "text-cyan-400", "shadow-[0_0_15px_rgba(6,182,212,0.3)]");
+                    }
+
                     if(data.preview_data && Array.isArray(data.preview_data)) {
                         renderPreviewGrid(data.preview_data);
                     }
@@ -370,15 +410,19 @@
         msgDiv.className = `chat-message fade-in relative z-10 ${role === "user" ? "" : "agent-message"}`;
 
         let avatarHTML = role === "user"
-            ? `<div class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0 text-white shadow-lg"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>`
-            : `<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/20"><svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></div>`;
+            ? `<div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0 text-white shadow-lg"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>`
+            : `<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.4)] border border-white/10"><svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></div>`;
 
         let htmlContent = text;
         if(window.marked) {
             htmlContent = marked.parse(text);
         }
 
-        msgDiv.innerHTML = `<div class="flex gap-4 max-w-4xl mx-auto">${avatarHTML}<div class="message-content flex-1 text-slate-300 text-sm leading-relaxed">${htmlContent}</div></div>`;
+        let innerContainer = role === "user"
+            ? `<div class="flex-1 text-slate-200 text-[13px] leading-relaxed pt-2">${htmlContent}</div>`
+            : `<div class="flex-1 text-slate-300 text-[13px] leading-relaxed glass-panel p-4 rounded-2xl rounded-tl-sm border border-white/5 shadow-md">${htmlContent}</div>`;
+
+        msgDiv.innerHTML = `<div class="flex gap-5 max-w-5xl mx-auto">${avatarHTML}${innerContainer}</div>`;
         DOM.chatHistory.appendChild(msgDiv);
         DOM.chatHistory.scrollTop = DOM.chatHistory.scrollHeight;
 
