@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <title>DataAgent Hub | Glassmorphism MVP</title>
+    <title>DataAgent Hub | Full Analytics Engine</title>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -43,7 +43,7 @@
         <div class="relative bg-white/10 backdrop-blur-lg border border-white/20 p-8 rounded-2xl shadow-2xl w-full max-w-md text-center transform transition-all">
             <div class="mb-8">
                 <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-emerald-400">DataAgent Hub</h2>
-                <p class="text-slate-300 text-sm mt-1">GCP Connected Analytics Sandbox</p>
+                <p class="text-slate-300 text-sm mt-1">Full Analytics Engine</p>
             </div>
             <form id="form-email-auth" class="space-y-4">
                 <input type="email" id="input-email" class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all" placeholder="Email" required>
@@ -61,7 +61,7 @@
     <div id="app-shell" class="hidden flex h-screen w-full relative z-10 transition-opacity duration-700 opacity-0">
 
         <!-- SIDEBAR -->
-        <aside class="w-72 flex flex-col border-r border-white/10 bg-black/20 backdrop-blur-md">
+        <aside id="main-sidebar" class="w-72 flex flex-col border-r border-white/10 bg-black/20 backdrop-blur-md transition-all duration-500 overflow-hidden shrink-0">
             <div class="p-6 border-b border-white/10">
                 <h3 class="text-lg font-bold text-white tracking-wide">DataAgent Hub</h3>
                 <p class="text-xs text-cyan-400 mt-1 font-medium">VERTEX AI / BIGQUERY LINKED</p>
@@ -89,18 +89,18 @@
                     <div class="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
                         <div>
                             <label class="block text-[10px] text-slate-400 mb-1">Date Range</label>
-                            <select class="w-full bg-black/40 border border-white/10 rounded-lg text-xs text-slate-200 p-2 focus:outline-none focus:border-cyan-400">
-                                <option>Q2 2024</option>
-                                <option>Q1 2024</option>
-                                <option>Last 30 Days</option>
+                            <select id="filter-date" class="w-full bg-black/40 border border-white/10 rounded-lg text-xs text-slate-200 p-2 focus:outline-none focus:border-cyan-400 transition-all">
+                                <option value="q2">Q2 2024</option>
+                                <option value="q1">Q1 2024</option>
+                                <option value="30d">Last 30 Days</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-[10px] text-slate-400 mb-1">Viewer Segment</label>
-                            <select class="w-full bg-black/40 border border-white/10 rounded-lg text-xs text-slate-200 p-2 focus:outline-none focus:border-cyan-400">
-                                <option>All Segments</option>
-                                <option>High-Value Subs</option>
-                                <option>Casual Scrollers</option>
+                            <select id="filter-segment" class="w-full bg-black/40 border border-white/10 rounded-lg text-xs text-slate-200 p-2 focus:outline-none focus:border-cyan-400 transition-all">
+                                <option value="all">All Segments</option>
+                                <option value="high">High-Value Subs</option>
+                                <option value="casual">Casual Scrollers</option>
                             </select>
                         </div>
                     </div>
@@ -120,14 +120,18 @@
         </aside>
 
         <!-- MAIN AREA -->
-        <main class="flex-1 flex flex-col bg-transparent relative z-0">
+        <main class="flex-1 flex flex-col bg-transparent relative z-0 h-full overflow-hidden">
             <!-- Header -->
-            <header class="h-16 border-b border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-between px-6">
+            <header class="h-16 shrink-0 border-b border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-between px-6 z-20">
                 <div class="flex items-center gap-4">
                     <div class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-xs font-medium flex items-center gap-2">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span id="header-status">Live GCP Pipeline</span>
                     </div>
+                    <button id="btn-toggle-view" class="px-3 py-1 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-full text-xs font-medium transition-all flex items-center gap-2">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+                        <span id="toggle-view-text">View as Webpage</span>
+                    </button>
                 </div>
                 <div class="flex items-center gap-4 text-xs font-mono text-slate-400">
                     <span id="header-cpu">Compute: OK</span>
@@ -136,54 +140,92 @@
                 </div>
             </header>
 
-            <!-- Dashboard Charts Area (Top Half) -->
-            <div class="h-64 border-b border-white/10 p-6 flex gap-6 shrink-0 bg-black/10">
-                <!-- Trend Chart -->
-                <div class="flex-1 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-4 flex flex-col relative overflow-hidden">
-                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl"></div>
-                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 z-10">Retention Trends (Q2)</h4>
-                    <div class="flex-1 relative z-10">
-                        <canvas id="trendChart"></canvas>
-                    </div>
-                </div>
+            <!-- Scrollable Main Content -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar relative p-6">
 
-                <!-- Risk Gauge -->
-                <div class="w-64 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-4 flex flex-col items-center justify-center relative overflow-hidden">
-                    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl"></div>
-                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 w-full text-left z-10">Avg Risk Score</h4>
-                    <div class="w-32 h-32 relative z-10">
-                        <canvas id="riskChart"></canvas>
-                    </div>
-                    <div class="absolute inset-0 flex items-center justify-center z-10 pt-6 pointer-events-none">
-                        <span class="text-2xl font-bold text-white">42%</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Chat / Logs History (Bottom Half) -->
-            <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar relative">
                 <!-- Background decoration -->
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-                <div class="chat-message agent-message relative z-10">
-                    <div class="flex gap-4 max-w-4xl mx-auto">
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/20">
-                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                <!-- Dashboard Charts Area (Multi-Chart Expansion) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6 relative z-10">
+
+                    <!-- Retention Trends -->
+                    <div id="chart-container-retention" class="chart-panel lg:col-span-1 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-4 flex flex-col relative overflow-hidden transition-all duration-300 h-64">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl"></div>
+                        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 z-10">Retention Trends</h4>
+                        <div class="flex-1 relative z-10 min-h-0">
+                            <canvas id="trendChart"></canvas>
                         </div>
-                        <div class="flex-1 text-slate-300 text-sm leading-relaxed">
-                            <strong class="text-white block mb-1">Vertex AI Agent Initialized.</strong>
-                            Connected to BigQuery backend (fallback: cuDF enabled). Upload a specific dataset or enter an analytical prompt to process raw logs.
+                    </div>
+
+                    <!-- Revenue Breakdown -->
+                    <div id="chart-container-revenue" class="chart-panel lg:col-span-1 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-4 flex flex-col relative overflow-hidden transition-all duration-300 h-64">
+                        <div class="absolute -top-10 -left-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl"></div>
+                        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 z-10">Revenue Distribution</h4>
+                        <div class="flex-1 relative z-10 min-h-0">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Audience Traffic Doughnut -->
+                    <div id="chart-container-traffic" class="chart-panel lg:col-span-1 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-4 flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 h-64">
+                        <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl"></div>
+                        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 w-full text-left z-10">Traffic Sources</h4>
+                        <div class="w-full h-full relative z-10 flex items-center justify-center p-2">
+                            <canvas id="trafficChart"></canvas>
                         </div>
                     </div>
                 </div>
+
+                <!-- Isolated Data Preview Grid -->
+                <div class="mb-6 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-5 relative overflow-hidden z-10 hidden" id="data-grid-container">
+                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                        Isolated Data Preview Grid
+                    </h4>
+                    <div class="overflow-x-auto custom-scrollbar rounded-lg border border-white/10 bg-black/20">
+                        <table class="w-full text-left text-sm text-slate-300">
+                            <thead class="text-xs uppercase bg-black/40 text-slate-400 border-b border-white/10">
+                                <tr>
+                                    <th class="px-4 py-3 font-medium">User_ID</th>
+                                    <th class="px-4 py-3 font-medium">Platform</th>
+                                    <th class="px-4 py-3 font-medium">Retention_Rate</th>
+                                    <th class="px-4 py-3 font-medium text-right">Revenue ($)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="data-grid-body" class="divide-y divide-white/5">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Chat / Logs History -->
+                <div id="chat-history" class="space-y-6 relative z-10">
+                    <div class="chat-message agent-message relative">
+                        <div class="flex gap-4 max-w-4xl mx-auto">
+                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/20">
+                                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            </div>
+                            <div class="flex-1 text-slate-300 text-sm leading-relaxed">
+                                <strong class="text-white block mb-1">DataAgent Hub Initialized.</strong>
+                                Welcome to the full analytics suite. Use the global filters, upload a dataset to view the data grid, or enter a natural language prompt below to analyze specific verticals (e.g. "Show me traffic distribution" or "Show me revenue metrics").
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom spacing for the absolute input -->
+                <div class="h-32"></div>
             </div>
 
             <!-- Input Area -->
-            <div class="p-6 pt-2 bg-gradient-to-t from-black/60 to-transparent relative z-10">
-                <div class="max-w-4xl mx-auto relative group">
+            <div class="absolute bottom-0 left-0 right-0 p-6 pt-12 bg-gradient-to-t from-black via-black/80 to-transparent z-20 pointer-events-none">
+                <div class="max-w-4xl mx-auto relative group pointer-events-auto">
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl blur opacity-20 group-focus-within:opacity-40 transition duration-500"></div>
-                    <div class="relative bg-black/40 backdrop-blur-xl border border-white/20 rounded-2xl flex items-end p-2 shadow-2xl">
-                        <textarea id="chat-input" rows="1" class="w-full bg-transparent border-0 text-slate-100 placeholder-slate-500 text-sm px-4 py-3 focus:ring-0 resize-none max-h-48 overflow-y-auto custom-scrollbar" placeholder="Analyze Q2 creator retention logs..."></textarea>
+                    <div class="relative bg-black/60 backdrop-blur-xl border border-white/20 rounded-2xl flex items-end p-2 shadow-2xl">
+                        <textarea id="chat-input" rows="1" class="w-full bg-transparent border-0 text-slate-100 placeholder-slate-500 text-sm px-4 py-3 focus:ring-0 resize-none max-h-48 overflow-y-auto custom-scrollbar" placeholder="Ask the Data Agent (e.g., 'Analyze Q2 creator retention logs...')..."></textarea>
                         <button id="btn-send-chat" class="w-10 h-10 mb-1 ml-2 mr-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-cyan-400 transition-all flex-shrink-0 group-focus-within:bg-gradient-to-r group-focus-within:from-cyan-500 group-focus-within:to-blue-500 group-focus-within:text-white group-focus-within:border-transparent shadow-lg">
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                         </button>

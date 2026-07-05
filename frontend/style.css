@@ -91,3 +91,17 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Data Preview Grid styling for smooth row animations */
+#data-grid-body tr {
+    transition: all 0.2s ease-in-out;
+}
+#data-grid-body tr:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(1.01);
+}
+
+/* Ensure chart panels transition smoothly when highlighted */
+.chart-panel {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

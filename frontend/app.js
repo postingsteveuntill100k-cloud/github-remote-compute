@@ -1,4 +1,5 @@
 (function() {
+    // Keep exact DOM bindings but expand for new elements safely
     const DOM = {
         authGate: document.getElementById("auth-gate"),
         appShell: document.getElementById("app-shell"),
@@ -15,14 +16,47 @@
         headerRam: document.getElementById("header-ram"),
         headerStatus: document.getElementById("header-status"),
         btnUploadDb: document.getElementById("btn-upload-db"),
-        dbFile: document.getElementById("dbFile")
+        dbFile: document.getElementById("dbFile"),
+
+        // New elements
+        sidebar: document.getElementById("main-sidebar"),
+        btnToggleView: document.getElementById("btn-toggle-view"),
+        toggleViewText: document.getElementById("toggle-view-text"),
+        dataGridContainer: document.getElementById("data-grid-container"),
+        dataGridBody: document.getElementById("data-grid-body"),
+
+        // Filters
+        filterDate: document.getElementById("filter-date"),
+        filterSegment: document.getElementById("filter-segment"),
+
+        // Chart panels
+        chartRetention: document.getElementById("chart-container-retention"),
+        chartRevenue: document.getElementById("chart-container-revenue"),
+        chartTraffic: document.getElementById("chart-container-traffic"),
     };
 
     let idToken = null;
     let ws = null;
     let isSignedIn = false;
     let trendChart = null;
-    let riskChart = null;
+    let revenueChart = null;
+    let trafficChart = null;
+
+    // ----- VIEW TOGGLE -----
+    if(DOM.btnToggleView) {
+        DOM.btnToggleView.onclick = () => {
+            const isHidden = DOM.sidebar.classList.contains("w-0");
+            if (isHidden) {
+                DOM.sidebar.classList.remove("w-0", "opacity-0", "px-0");
+                DOM.sidebar.classList.add("w-72");
+                DOM.toggleViewText.textContent = "View as Webpage";
+            } else {
+                DOM.sidebar.classList.remove("w-72");
+                DOM.sidebar.classList.add("w-0", "opacity-0", "px-0");
+                DOM.toggleViewText.textContent = "Show Controls";
+            }
+        };
+    }
 
     // ----- CHART INITIALIZATION -----
     function initCharts() {
@@ -31,6 +65,7 @@
         Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
         Chart.defaults.font.family = "'Inter', sans-serif";
 
+        // 1. Retention Trend Chart (Line)
         const trendCtx = document.getElementById('trendChart')?.getContext('2d');
         if(trendCtx) {
             trendChart = new Chart(trendCtx, {
@@ -55,27 +90,52 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true, max: 100,
-                            grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false }
-                        },
-                        x: {
-                            grid: { display: false, drawBorder: false }
-                        }
+                        y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false } },
+                        x: { grid: { display: false, drawBorder: false } }
                     }
                 }
             });
         }
 
-        const riskCtx = document.getElementById('riskChart')?.getContext('2d');
-        if(riskCtx) {
-            riskChart = new Chart(riskCtx, {
+        // 2. Revenue Breakdown (Horizontal Bar)
+        const revCtx = document.getElementById('revenueChart')?.getContext('2d');
+        if(revCtx) {
+            revenueChart = new Chart(revCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Gaming', 'Tech', 'Vlogs', 'Music', 'Edu'],
+                    datasets: [{
+                        label: 'Revenue ($K)',
+                        data: [120, 95, 80, 60, 45],
+                        backgroundColor: 'rgba(16, 185, 129, 0.6)', // emerald-500
+                        borderColor: '#10b981',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 3. Traffic Distribution (Doughnut)
+        const trafficCtx = document.getElementById('trafficChart')?.getContext('2d');
+        if(trafficCtx) {
+            trafficChart = new Chart(trafficCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+                    labels: ['Organic', 'Direct', 'Referral', 'Social'],
                     datasets: [{
-                        data: [22, 36, 42],
-                        backgroundColor: ['#f43f5e', '#f59e0b', '#10b981'],
+                        data: [40, 25, 20, 15],
+                        backgroundColor: ['#8b5cf6', '#0ea5e9', '#10b981', '#f59e0b'],
                         borderWidth: 0,
                         hoverOffset: 4
                     }]
@@ -83,31 +143,70 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '75%',
-                    plugins: { legend: { display: false }, tooltip: { enabled: true } }
+                    cutout: '65%',
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } }
+                    }
                 }
             });
         }
     }
 
-    function updateCharts(data) {
-        // Just simulate a change for the visual effect
+    function animateChartUpdates() {
+        // Coordinated animation frame for updating datasets
         if(trendChart) {
-            trendChart.data.datasets[0].data = trendChart.data.datasets[0].data.map(v => v + (Math.random()*10 - 5));
+            trendChart.data.datasets[0].data = trendChart.data.datasets[0].data.map(v => Math.max(10, Math.min(100, v + (Math.random()*20 - 10))));
             trendChart.update();
+        }
+        if(revenueChart) {
+            revenueChart.data.datasets[0].data = revenueChart.data.datasets[0].data.map(v => Math.max(20, v + (Math.random()*30 - 15)));
+            revenueChart.update();
+        }
+        if(trafficChart) {
+            const r1 = Math.random()*20; const r2 = Math.random()*20; const r3 = Math.random()*20; const r4 = 100 - (r1+r2+r3);
+            trafficChart.data.datasets[0].data = [r1, r2, r3, r4];
+            trafficChart.update();
         }
     }
 
+    // ----- DYNAMIC CONTENT SWITCHING -----
+    if(DOM.filterDate && DOM.filterSegment) {
+        DOM.filterDate.onchange = animateChartUpdates;
+        DOM.filterSegment.onchange = animateChartUpdates;
+    }
+
+    function highlightChartIntent(text) {
+        const lower = text.toLowerCase();
+
+        // Reset all
+        if(DOM.chartRetention) DOM.chartRetention.classList.remove("ring-2", "ring-cyan-400", "shadow-[0_0_15px_rgba(34,211,238,0.5)]", "scale-[1.02]");
+        if(DOM.chartRevenue) DOM.chartRevenue.classList.remove("ring-2", "ring-emerald-400", "shadow-[0_0_15px_rgba(16,185,129,0.5)]", "scale-[1.02]");
+        if(DOM.chartTraffic) DOM.chartTraffic.classList.remove("ring-2", "ring-purple-400", "shadow-[0_0_15px_rgba(168,85,247,0.5)]", "scale-[1.02]");
+
+        // Highlight based on intent
+        if(lower.includes("revenue") || lower.includes("money") || lower.includes("earnings")) {
+            if(DOM.chartRevenue) DOM.chartRevenue.classList.add("ring-2", "ring-emerald-400", "shadow-[0_0_15px_rgba(16,185,129,0.5)]", "scale-[1.02]");
+        } else if (lower.includes("traffic") || lower.includes("source") || lower.includes("audience")) {
+            if(DOM.chartTraffic) DOM.chartTraffic.classList.add("ring-2", "ring-purple-400", "shadow-[0_0_15px_rgba(168,85,247,0.5)]", "scale-[1.02]");
+        } else if (lower.includes("retention") || lower.includes("trend")) {
+            if(DOM.chartRetention) DOM.chartRetention.classList.add("ring-2", "ring-cyan-400", "shadow-[0_0_15px_rgba(34,211,238,0.5)]", "scale-[1.02]");
+        }
+    }
+
+
     // ----- FIREBASE AUTH (MOCK OR REAL) -----
     function initMockAuth() {
-        DOM.formEmailAuth.onsubmit = (e) => {
-            e.preventDefault();
-            idToken = "mock_token_" + Date.now();
-            isSignedIn = true;
-            enterApp({ email: DOM.inputEmail.value, displayName: "Data Analyst" });
-        };
-        DOM.btnEmailRegister.onclick = DOM.formEmailAuth.onsubmit;
-
+        if(DOM.formEmailAuth) {
+            DOM.formEmailAuth.onsubmit = (e) => {
+                e.preventDefault();
+                idToken = "mock_token_" + Date.now();
+                isSignedIn = true;
+                enterApp({ email: DOM.inputEmail.value, displayName: "Data Analyst" });
+            };
+        }
+        if(DOM.btnEmailRegister) {
+            DOM.btnEmailRegister.onclick = DOM.formEmailAuth.onsubmit;
+        }
         if(DOM.btnLogout) {
             DOM.btnLogout.onclick = () => exitApp();
         }
@@ -116,7 +215,6 @@
     function enterApp(user) {
         DOM.authGate.classList.add("hidden");
         DOM.appShell.classList.remove("hidden");
-        // Fade in effect
         setTimeout(() => DOM.appShell.classList.remove("opacity-0"), 50);
 
         DOM.userName.textContent = user.displayName || user.email.split("@")[0];
@@ -154,77 +252,120 @@
     }
 
     // ----- CHAT INPUT & SEND -----
-    DOM.chatInput.addEventListener('input', function() {
-        this.style.height = "24px";
-        this.style.height = `${Math.min(this.scrollHeight, 200)}px`;
-    });
+    if(DOM.chatInput) {
+        DOM.chatInput.addEventListener('input', function() {
+            this.style.height = "24px";
+            this.style.height = `${Math.min(this.scrollHeight, 200)}px`;
+        });
 
-    DOM.chatInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            DOM.btnSendChat.click();
-        }
-    });
-
-    DOM.btnSendChat.onclick = async () => {
-        const text = DOM.chatInput.value.trim();
-        if (!text) return;
-        appendChat("user", text);
-        DOM.chatInput.value = "";
-        DOM.chatInput.style.height = "24px";
-
-        try {
-            const res = await fetch("/api/sandbox/run", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
-                body: JSON.stringify({ command: text })
-            });
-            const data = await res.json();
-            if(data.output) {
-                appendChat("system", data.output);
-                updateCharts(data); // animate charts on success
+        DOM.chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                DOM.btnSendChat.click();
             }
-        } catch(e) {
-            appendChat("system", `Error: ${e.message}`);
-        }
-    };
+        });
+    }
 
-    // ----- UPLOAD DB FILE -----
-    DOM.btnUploadDb.onclick = async () => {
-        const file = DOM.dbFile.files[0];
-        if (!file) {
-            alert("Please select a file first.");
-            return;
-        }
+    if(DOM.btnSendChat) {
+        DOM.btnSendChat.onclick = async () => {
+            const text = DOM.chatInput.value.trim();
+            if (!text) return;
+            appendChat("user", text);
+            DOM.chatInput.value = "";
+            DOM.chatInput.style.height = "24px";
 
-        DOM.btnUploadDb.textContent = "Uploading...";
-        const formData = new FormData();
-        formData.append("file", file);
+            highlightChartIntent(text);
 
-        try {
-            const res = await fetch("/api/sandbox/upload", {
-                method: "POST",
-                headers: { "Authorization": `Bearer ${idToken}` },
-                body: formData
-            });
-
-            if(res.ok) {
-                DOM.btnUploadDb.textContent = "Uploaded!";
-                DOM.headerStatus.textContent = "Database Connected";
-                appendChat("system", `**Dataset Uploaded:** \`${file.name}\` successfully ingested into the secure analytics sandbox.`);
-                setTimeout(() => DOM.btnUploadDb.textContent = "Upload to Sandbox", 3000);
-            } else {
-                throw new Error("Upload failed");
+            try {
+                const res = await fetch("/api/sandbox/run", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
+                    body: JSON.stringify({ command: text })
+                });
+                const data = await res.json();
+                if(data.output) {
+                    appendChat("system", data.output);
+                    animateChartUpdates(); // animate charts on success
+                }
+            } catch(e) {
+                appendChat("system", `Error: ${e.message}`);
             }
-        } catch(e) {
-            DOM.btnUploadDb.textContent = "Error";
-            setTimeout(() => DOM.btnUploadDb.textContent = "Upload to Sandbox", 2000);
-            appendChat("system", `**Error:** Failed to upload \`${file.name}\`. ${e.message}`);
-        }
-    };
+        };
+    }
+
+    // ----- UPLOAD DB FILE & PREVIEW GRID -----
+    function renderPreviewGrid(rows) {
+        if(!DOM.dataGridContainer || !DOM.dataGridBody) return;
+        DOM.dataGridBody.innerHTML = "";
+        rows.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.className = "hover:bg-white/5 transition-colors";
+            tr.innerHTML = `
+                <td class="px-4 py-3 border-r border-white/5 font-mono text-xs text-slate-400">${row.User_ID || "-"}</td>
+                <td class="px-4 py-3 border-r border-white/5 text-cyan-300">${row.Platform || "-"}</td>
+                <td class="px-4 py-3 border-r border-white/5">
+                    <div class="flex items-center gap-2">
+                        <div class="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div class="h-full ${parseFloat(row.Retention_Rate) > 50 ? 'bg-emerald-500' : 'bg-red-500'}" style="width: ${row.Retention_Rate}%"></div>
+                        </div>
+                        <span class="text-xs text-slate-300">${row.Retention_Rate}%</span>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-right font-medium text-emerald-400">$${parseFloat(row.Revenue).toFixed(2) || "0.00"}</td>
+            `;
+            DOM.dataGridBody.appendChild(tr);
+        });
+
+        // Show the grid container with a smooth fade in
+        DOM.dataGridContainer.classList.remove("hidden");
+        DOM.dataGridContainer.classList.add("fade-in");
+    }
+
+    if(DOM.btnUploadDb) {
+        DOM.btnUploadDb.onclick = async () => {
+            const file = DOM.dbFile.files[0];
+            if (!file) {
+                alert("Please select a file first.");
+                return;
+            }
+
+            DOM.btnUploadDb.textContent = "Uploading...";
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const res = await fetch("/api/sandbox/upload", {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${idToken}` },
+                    body: formData
+                });
+
+                if(res.ok) {
+                    const data = await res.json();
+                    DOM.btnUploadDb.textContent = "Uploaded!";
+                    DOM.headerStatus.textContent = "Database Connected";
+
+                    // Render preview grid if backend sent data
+                    if(data.preview_data && Array.isArray(data.preview_data)) {
+                        renderPreviewGrid(data.preview_data);
+                    }
+
+                    appendChat("system", `**Dataset Uploaded:** \`${file.name}\` successfully ingested into the secure analytics sandbox. Sample isolated data grid populated below charts.`);
+                    setTimeout(() => DOM.btnUploadDb.textContent = "Upload to Sandbox", 3000);
+                } else {
+                    throw new Error("Upload failed");
+                }
+            } catch(e) {
+                DOM.btnUploadDb.textContent = "Error";
+                setTimeout(() => DOM.btnUploadDb.textContent = "Upload to Sandbox", 2000);
+                appendChat("system", `**Error:** Failed to upload \`${file.name}\`. ${e.message}`);
+            }
+        };
+    }
 
     // ----- CHAT RENDERER -----
     function appendChat(role, text) {
+        if(!DOM.chatHistory) return;
         const msgDiv = document.createElement("div");
         msgDiv.className = `chat-message fade-in relative z-10 ${role === "user" ? "" : "agent-message"}`;
 
@@ -257,7 +398,6 @@
             try {
                 const entry = JSON.parse(event.data);
                 if(entry.msg && !entry.msg.includes("Telemetry") && !entry.msg.includes("Heartbeat")) {
-                     // small toast or silent console log for glassmorphism
                      console.log("System Log: ", entry.msg);
                 }
             } catch(e) {}
