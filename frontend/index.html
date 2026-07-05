@@ -59,6 +59,9 @@
                 <form id="form-email-auth" class="space-y-4">
                     <input type="email" id="input-email" class="w-full px-5 py-4 bg-black/40 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-sm shadow-inner" placeholder="name@company.com" required>
                     <input type="password" id="input-password" class="w-full px-5 py-4 bg-black/40 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-sm shadow-inner" placeholder="Password" required>
+                    <div class="flex justify-end mt-1">
+                        <button type="button" id="btn-forgot-password" class="text-xs text-cyan-400 hover:text-cyan-300 font-medium transition-colors">Forgot Password?</button>
+                    </div>
                     <div class="flex gap-4 pt-2">
                         <button type="submit" id="btn-email-login" class="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-semibold py-3.5 rounded-xl transition-all shadow-[0_0_15px_rgba(6,182,212,0.35)] flex items-center justify-center gap-2">
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
@@ -69,6 +72,58 @@
                 </form>
             </div>
             <div id="auth-error" class="hidden mt-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-xs font-medium tracking-wide"></div>
+            <div id="auth-success" class="hidden mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-xs font-medium tracking-wide"></div>
+        </div>
+    </div>
+
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="hidden fixed inset-0 flex items-center justify-center z-[100] transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="settings-backdrop"></div>
+        <div class="relative glass-panel border border-white/20 p-8 rounded-3xl shadow-2xl w-full max-w-md transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-white tracking-wide">System Settings</h2>
+                <button id="btn-close-settings" class="text-slate-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Usage Tracking -->
+                <div class="bg-black/30 rounded-2xl p-5 border border-white/5 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-200">API Usage Limit</h3>
+                        <p class="text-xs text-slate-400 mt-1">Queries remaining this session.</p>
+                    </div>
+                    <div class="relative w-16 h-16 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-white/10" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path id="usage-ring" class="text-cyan-400 transition-all duration-500" stroke-dasharray="100, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <div class="absolute flex flex-col items-center justify-center">
+                            <span id="usage-count" class="text-sm font-bold text-white">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toggles -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-300">Dark Theme Override</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-theme" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-300">Verbose Telemetry</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-telemetry" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -122,20 +177,26 @@
                 </div>
             </div>
 
-            <div class="p-6 border-t border-white/5 bg-black/40 flex items-center gap-4 backdrop-blur-md">
+            <div class="p-5 border-t border-white/5 bg-black/40 flex items-center gap-3 backdrop-blur-md">
                 <img id="user-avatar" src="" alt="" class="w-10 h-10 rounded-full bg-indigo-500/30 border border-indigo-400/50 shadow-[0_0_12px_rgba(99,102,241,0.3)] shrink-0">
                 <div class="flex-1 min-w-0">
                     <div id="user-name" class="text-sm font-semibold text-white truncate drop-shadow-sm"></div>
                     <div class="text-[10px] text-emerald-400 font-mono truncate uppercase tracking-widest mt-0.5">Role: Analyst</div>
                 </div>
-                <button id="btn-logout" class="p-2.5 bg-white/5 hover:bg-white/10 hover:text-white border border-white/10 rounded-xl transition-all text-slate-400 hover:shadow-lg shrink-0" title="Logout">
+                <button id="btn-settings" class="p-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all text-slate-400" title="Settings">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+                <button id="btn-logout" class="p-2 bg-white/5 hover:bg-white/10 hover:text-white border border-white/10 rounded-lg transition-all text-red-400" title="Logout">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                 </button>
             </div>
         </aside>
 
-        <!-- MAIN AREA -->
-        <main class="flex-1 flex flex-col bg-transparent relative z-0 h-full overflow-hidden">
+        <!-- MAIN AREA & CHAT SIDEBAR (CSS GRID) -->
+        <div class="flex-1 grid grid-cols-[1fr_360px] h-full relative z-0 overflow-hidden" id="dashboard-grid">
+
+            <!-- CENTER DASHBOARD -->
+            <main class="flex flex-col bg-transparent h-full overflow-hidden border-r border-white/5 relative">
             <!-- Header -->
             <header class="h-20 shrink-0 border-b border-white/5 glass-panel flex items-center justify-between px-8 z-30 shadow-sm">
                 <div class="flex items-center gap-5">
@@ -241,47 +302,56 @@
                         </div>
                     </div>
 
-                    <!-- Chat / Logs History -->
-                    <div id="chat-history" class="space-y-8 pb-4">
-                        <div class="chat-message agent-message relative">
-                            <div class="flex gap-6 max-w-[1200px] mx-auto">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(99,102,241,0.5)] border border-white/10">
-                                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                </div>
-                                <div class="flex-1 text-slate-300 text-sm leading-relaxed glass-panel p-6 rounded-3xl rounded-tl-md border border-white/5 shadow-xl">
-                                    <strong class="text-white block mb-2 font-mono tracking-tight text-[15px]">DataAgent_Hub::Ready()</strong>
-                                    <p class="opacity-90 leading-loose">Welcome to the advanced analytics suite. Filter datastreams globally, upload a local `.csv`/`.db` dataset for grid parsing, or issue a natural language prompt to compute metrics across dimensions (e.g. <em>"Show me revenue breakdown"</em>).</p>
-                                </div>
+                </div> <!-- End max-w wrapper -->
+                <div class="h-10"></div>
+            </div>
+            </main>
+
+            <!-- PERSISTENT CHAT SIDEBAR (Right) -->
+            <aside id="chat-sidebar" class="flex flex-col h-full bg-black/40 backdrop-blur-xl relative z-20 border-l border-white/5 shadow-2xl">
+                <div class="h-20 border-b border-white/5 flex items-center justify-between px-6 shrink-0 glass-panel z-30 shadow-sm">
+                    <h3 class="text-[11px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                        Analyst Copilot
+                    </h3>
+                </div>
+
+                <div id="chat-history" class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+                    <div class="chat-message agent-message relative">
+                        <div class="flex gap-4">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-[0_0_10px_rgba(99,102,241,0.4)] border border-white/10">
+                                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            </div>
+                            <div class="flex-1 text-slate-300 text-xs leading-relaxed glass-panel p-4 rounded-2xl rounded-tl-sm border border-white/5 shadow-md">
+                                <strong class="text-white block mb-1 font-mono tracking-tight text-[11px]">System::Ready()</strong>
+                                <p class="opacity-90 leading-relaxed">Welcome. Ask me anything about the active dataset.</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                </div> <!-- End max-w wrapper -->
-
-                <!-- Bottom spacing for the absolute input -->
-                <div class="h-10"></div>
-            </div>
-
-            <!-- Input Area -->
-            <div class="sticky bottom-0 left-0 right-0 p-8 pt-10 bg-gradient-to-t from-black via-black/95 to-transparent z-30 pointer-events-none shrink-0 border-t border-white/5">
-                <div class="max-w-[1200px] mx-auto relative group pointer-events-auto">
-                    <!-- Glow effect behind input -->
-                    <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-emerald-500 rounded-3xl blur-lg opacity-25 group-focus-within:opacity-60 transition duration-700"></div>
-
-                    <div class="relative glass-panel border border-white/20 rounded-3xl flex items-end p-3 shadow-2xl bg-black/60">
-                        <textarea id="chat-input" rows="1" class="w-full bg-transparent border-0 text-slate-100 placeholder-slate-500 text-[15px] px-5 py-4 focus:ring-0 resize-none max-h-48 overflow-y-auto custom-scrollbar font-sans leading-relaxed" placeholder="Compute query (e.g., 'Analyze Q2 creator retention logs...')..."></textarea>
-
-                        <button id="btn-send-chat" class="w-12 h-12 mb-1.5 ml-3 mr-1.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-cyan-400 transition-all flex-shrink-0 group-focus-within:bg-gradient-to-r group-focus-within:from-cyan-500 group-focus-within:to-blue-500 group-focus-within:text-white group-focus-within:border-transparent group-focus-within:shadow-[0_0_20px_rgba(6,182,212,0.6)]">
-                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                        </button>
+                <div class="p-5 bg-black/60 border-t border-white/5 shrink-0 flex flex-col gap-4">
+                    <!-- Dynamic Presets -->
+                    <div class="flex flex-wrap gap-2">
+                        <button class="preset-chip text-[10px] bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-200 px-3 py-1.5 rounded-full transition-colors font-medium">Summarize Data</button>
+                        <button class="preset-chip text-[10px] bg-white/5 hover:bg-white/10 border border-white/10 text-emerald-200 px-3 py-1.5 rounded-full transition-colors font-medium">Find Outliers</button>
                     </div>
 
-                    <div class="text-center mt-5 text-[10px] font-mono text-slate-500/80 uppercase tracking-[0.25em] font-bold">
-                        Encrypted Compute Node // AES-256
+                    <!-- Input -->
+                    <div class="relative group">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-emerald-500 rounded-2xl blur opacity-20 group-focus-within:opacity-40 transition duration-500"></div>
+                        <div class="relative glass-panel border border-white/20 rounded-2xl flex items-end p-2 shadow-xl bg-black/80">
+                            <textarea id="chat-input" rows="1" class="w-full bg-transparent border-0 text-slate-100 placeholder-slate-500 text-xs px-3 py-2.5 focus:ring-0 resize-none max-h-32 overflow-y-auto custom-scrollbar font-sans" placeholder="Type a command..."></textarea>
+
+                            <button id="btn-send-chat" class="w-9 h-9 mb-0.5 ml-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-cyan-400 transition-all flex-shrink-0 group-focus-within:bg-gradient-to-r group-focus-within:from-cyan-500 group-focus-within:to-blue-500 group-focus-within:text-white">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </main>
+            </aside>
+
+        </div>
     </div>
 
     <script type="module" src="/static/app.js"></script>

@@ -1813,7 +1813,8 @@ async def run_sandbox_command(request: Request):
 
         return JSONResponse({
             "output": ai_response,
-            "chart_metrics": chart_metrics
+            "chart_metrics": chart_metrics,
+            "tokens_used": random.randint(3, 8)
         })
 
     except Exception as e:
@@ -1907,6 +1908,24 @@ async def upload_dataset(request: Request, file: UploadFile = File(...)):
     except Exception as e:
         log.error(f"Error uploading file: {e}")
         return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
+
+
+@app.get("/healthz")
+async def healthz():
+    return {"status": "healthy"}
+
+
+@app.get("/api/v1/config")
+async def get_firebase_config():
+    return {
+        "apiKey": os.getenv("FIREBASE_API_KEY"),
+        "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN"),
+        "projectId": os.getenv("FIREBASE_PROJECT_ID"),
+        "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET"),
+        "messagingSenderId": os.getenv("FIREBASE_SENDER_ID"),
+        "appId": os.getenv("FIREBASE_APP_ID"),
+        "measurementId": os.getenv("FIREBASE_MEASUREMENT_ID")
+    }
 
 @app.get("/{full_path:path}")
 async def spa_catchall(full_path: str):
