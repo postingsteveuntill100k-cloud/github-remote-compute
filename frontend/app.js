@@ -5,6 +5,7 @@
         formEmailAuth: document.getElementById("form-email-auth"),
         inputEmail: document.getElementById("input-email"),
         btnEmailRegister: document.getElementById("btn-email-register"),
+        btnGoogleLogin: document.getElementById("btn-google-login"),
         userAvatar: document.getElementById("user-avatar"),
         userName: document.getElementById("user-name"),
         btnLogout: document.getElementById("btn-logout"),
@@ -329,6 +330,18 @@
                 const password = document.getElementById("input-password").value;
                 try {
                     await firebase.auth().createUserWithEmailAndPassword(email, password);
+                } catch (error) {
+                    const authError = document.getElementById("auth-error");
+                    authError.textContent = error.message;
+                    authError.classList.remove("hidden");
+                }
+            };
+        }
+        if(DOM.btnGoogleLogin) {
+            DOM.btnGoogleLogin.onclick = async () => {
+                try {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    await firebase.auth().signInWithPopup(provider);
                 } catch (error) {
                     const authError = document.getElementById("auth-error");
                     authError.textContent = error.message;
