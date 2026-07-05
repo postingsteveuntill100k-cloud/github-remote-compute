@@ -171,19 +171,25 @@
         }
     }
 
-    function animateChartUpdates() {
-        if(trendChart) {
-            trendChart.data.datasets[0].data = trendChart.data.datasets[0].data.map(v => Math.max(10, Math.min(100, v + (Math.random()*20 - 10))));
-            trendChart.update();
-        }
-        if(revenueChart) {
-            revenueChart.data.datasets[0].data = revenueChart.data.datasets[0].data.map(v => Math.max(20, v + (Math.random()*30 - 15)));
-            revenueChart.update();
-        }
-        if(trafficChart) {
-            const r1 = Math.random()*20; const r2 = Math.random()*20; const r3 = Math.random()*20; const r4 = 100 - (r1+r2+r3);
-            trafficChart.data.datasets[0].data = [r1, r2, r3, r4];
-            trafficChart.update();
+    function animateChartUpdates(dataObj = null) {
+        if (dataObj && dataObj.charts) {
+            if(trendChart && dataObj.charts.trend) {
+                trendChart.data.datasets[0].data = dataObj.charts.trend;
+                trendChart.update();
+            }
+            if(revenueChart && dataObj.charts.revenue) {
+                revenueChart.data.datasets[0].data = dataObj.charts.revenue;
+                revenueChart.update();
+            }
+            if(trafficChart && dataObj.charts.traffic) {
+                trafficChart.data.datasets[0].data = dataObj.charts.traffic;
+                trafficChart.update();
+            }
+        } else {
+            // Visual trigger without data mutation
+            if(trendChart) trendChart.update();
+            if(revenueChart) revenueChart.update();
+            if(trafficChart) trafficChart.update();
         }
     }
 
@@ -278,21 +284,62 @@
         if(loader) loader.remove();
     }
 
-    // ----- FIREBASE AUTH (MOCK) -----
-    function initMockAuth() {
-        if(DOM.formEmailAuth) {
-            DOM.formEmailAuth.onsubmit = (e) => {
-                e.preventDefault();
-                idToken = "mock_token_" + Date.now();
+    // ----- LIVE FIREBASE AUTHENTICATION -----
+    const firebaseConfig = {
+        apiKey: "AIzaSy_YOUR_API_KEY_HERE",
+        authDomain: "your-project-id.firebaseapp.com",
+        projectId: "your-project-id",
+        storageBucket: "your-project-id.appspot.com",
+        messagingSenderId: "1234567890",
+        appId: "1:1234567890:web:abcdef123456"
+    };
+
+    function initFirebaseAuth() {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                idToken = await user.getIdToken();
                 isSignedIn = true;
-                enterApp({ email: DOM.inputEmail.value, displayName: "Data Analyst" });
+                enterApp({ email: user.email, displayName: user.displayName || "Data Analyst" });
+            } else {
+                exitApp();
+            }
+        });
+
+        if(DOM.formEmailAuth) {
+            DOM.formEmailAuth.onsubmit = async (e) => {
+                e.preventDefault();
+                const email = DOM.inputEmail.value;
+                const password = document.getElementById("input-password").value;
+                try {
+                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                } catch (error) {
+                    const authError = document.getElementById("auth-error");
+                    authError.textContent = error.message;
+                    authError.classList.remove("hidden");
+                }
             };
         }
         if(DOM.btnEmailRegister) {
-            DOM.btnEmailRegister.onclick = DOM.formEmailAuth.onsubmit;
+            DOM.btnEmailRegister.onclick = async () => {
+                const email = DOM.inputEmail.value;
+                const password = document.getElementById("input-password").value;
+                try {
+                    await firebase.auth().createUserWithEmailAndPassword(email, password);
+                } catch (error) {
+                    const authError = document.getElementById("auth-error");
+                    authError.textContent = error.message;
+                    authError.classList.remove("hidden");
+                }
+            };
         }
         if(DOM.btnLogout) {
-            DOM.btnLogout.onclick = () => exitApp();
+            DOM.btnLogout.onclick = () => {
+                firebase.auth().signOut();
+            };
         }
     }
 
@@ -370,7 +417,11 @@
                 removeSkeletonLoader();
                 if(data.output) {
                     appendChat("system", data.output);
-                    animateChartUpdates();
+                    if(data.chart_metrics) {
+                        animateChartUpdates({ charts: data.chart_metrics });
+                    } else {
+                        animateChartUpdates();
+                    }
                 }
             } catch(e) {
                 removeSkeletonLoader();
@@ -583,5 +634,5 @@
         };
     }
 
-    initMockAuth();
+    initFirebaseAuth();
 })();
