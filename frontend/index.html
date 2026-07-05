@@ -41,20 +41,20 @@
     <!-- AUTH GATE -->
     <div id="auth-gate" class="fixed inset-0 flex items-center justify-center z-50 transition-opacity duration-500">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-        <div class="relative glass-panel border border-white/10 p-8 rounded-2xl shadow-2xl w-full max-w-md text-center transform transition-all">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-emerald-400">DataAgent Hub</h2>
-                <p class="text-slate-300 text-sm mt-1 tracking-wide">Cyberpunk Analytics MVP</p>
+        <div class="relative glass-panel border border-white/10 p-10 rounded-3xl shadow-2xl w-full max-w-md text-center transform transition-all">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-emerald-400 pb-1">DataAgent Hub</h2>
+                <p class="text-slate-300 text-sm mt-2 tracking-wide font-medium">Cyberpunk Analytics MVP</p>
             </div>
-            <form id="form-email-auth" class="space-y-4">
-                <input type="email" id="input-email" class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all" placeholder="Email" required>
-                <input type="password" id="input-password" class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all" placeholder="Password" required>
-                <div class="flex gap-3 pt-2">
-                    <button type="submit" id="btn-email-login" class="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-medium py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(6,182,212,0.4)]">Login</button>
-                    <button type="button" id="btn-email-register" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/20 text-white font-medium py-3 rounded-xl transition-all">Register</button>
+            <form id="form-email-auth" class="space-y-5">
+                <input type="email" id="input-email" class="w-full px-5 py-4 bg-black/40 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-sm" placeholder="Email" required>
+                <input type="password" id="input-password" class="w-full px-5 py-4 bg-black/40 border border-white/10 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-sm" placeholder="Password" required>
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" id="btn-email-login" class="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-semibold py-4 rounded-xl transition-all shadow-[0_0_15px_rgba(6,182,212,0.4)]">Login</button>
+                    <button type="button" id="btn-email-register" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/20 text-white font-semibold py-4 rounded-xl transition-all">Register</button>
                 </div>
             </form>
-            <div id="auth-error" class="hidden mt-4 p-3 bg-red-500/20 border border-red-500/30 text-red-300 rounded-xl text-sm"></div>
+            <div id="auth-error" class="hidden mt-6 p-4 bg-red-500/20 border border-red-500/30 text-red-300 rounded-xl text-sm font-medium"></div>
         </div>
     </div>
 
@@ -62,43 +62,43 @@
     <div id="app-shell" class="hidden flex h-screen w-full relative z-10 transition-opacity duration-700 opacity-0">
 
         <!-- SIDEBAR -->
-        <aside id="main-sidebar" class="w-72 flex flex-col border-r border-white/5 glass-panel transition-all duration-500 overflow-hidden shrink-0 shadow-2xl">
-            <div class="p-6 border-b border-white/5">
-                <h3 class="text-lg font-bold text-white tracking-wide drop-shadow-md">DataAgent Hub</h3>
-                <p class="text-[10px] text-cyan-400 mt-1 font-mono font-medium tracking-widest uppercase glow-text">Vertex AI Connected</p>
+        <aside id="main-sidebar" class="w-80 flex flex-col border-r border-white/5 glass-panel transition-all duration-500 overflow-hidden shrink-0 shadow-2xl">
+            <div class="p-8 border-b border-white/5">
+                <h3 class="text-xl font-bold text-white tracking-wide drop-shadow-md">DataAgent Hub</h3>
+                <p class="text-[10px] text-cyan-400 mt-2 font-mono font-medium tracking-widest uppercase glow-text">Vertex AI Connected</p>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
+            <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
                 <!-- Data Connection -->
                 <div>
-                    <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Data Connection</h4>
-                    <div class="bg-black/30 border border-white/5 rounded-xl p-3 mb-2 flex items-center justify-between">
-                        <span class="text-sm font-medium text-slate-300">GCP Status</span>
-                        <span id="sidebar-port" class="flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.9)] animate-pulse"></span>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">Data Connection</h4>
+                    <div class="bg-black/30 border border-white/5 rounded-2xl p-4 mb-3 flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-300 px-1">GCP Status</span>
+                        <span id="sidebar-port" class="flex h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.9)] animate-pulse"></span>
                     </div>
 
-                    <div class="bg-black/30 border border-white/5 rounded-xl p-4 mt-3 transition-colors hover:border-white/10">
-                        <label class="block text-xs text-slate-300 mb-2 font-medium">Local Dataset Override</label>
-                        <input type="file" id="dbFile" accept=".db, .sqlite, .csv" class="w-full text-[10px] text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:uppercase file:tracking-wider file:bg-cyan-500/20 file:text-cyan-300 hover:file:bg-cyan-500/30 hover:file:shadow-[0_0_10px_rgba(6,182,212,0.3)] file:transition-all cursor-pointer">
-                        <button id="btn-upload-db" class="w-full mt-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[11px] uppercase tracking-wider font-semibold py-2 rounded-lg transition-all">Upload to Sandbox</button>
+                    <div class="bg-black/30 border border-white/5 rounded-2xl p-5 mt-4 transition-colors hover:border-white/10">
+                        <label class="block text-xs text-slate-300 mb-3 font-semibold px-1">Local Dataset Override</label>
+                        <input type="file" id="dbFile" accept=".db, .sqlite, .csv" class="w-full text-[10px] text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:uppercase file:tracking-wider file:bg-cyan-500/20 file:text-cyan-300 hover:file:bg-cyan-500/30 hover:file:shadow-[0_0_12px_rgba(6,182,212,0.3)] file:transition-all cursor-pointer">
+                        <button id="btn-upload-db" class="w-full mt-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[11px] uppercase tracking-wider font-semibold py-3 rounded-xl transition-all hover:shadow-lg">Upload to Sandbox</button>
                     </div>
                 </div>
 
                 <!-- Interactive Filters -->
                 <div>
-                    <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Global Filters</h4>
-                    <div class="bg-black/30 border border-white/5 rounded-xl p-4 space-y-3">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">Global Filters</h4>
+                    <div class="bg-black/30 border border-white/5 rounded-2xl p-5 space-y-5">
                         <div>
-                            <label class="block text-[10px] text-slate-400 mb-1">Date Range</label>
-                            <select id="filter-date" class="w-full bg-black/50 border border-white/10 rounded-lg text-xs text-slate-200 p-2 focus:outline-none focus:border-cyan-400 transition-all hover:border-white/20">
+                            <label class="block text-[11px] font-medium text-slate-400 mb-2 px-1">Date Range</label>
+                            <select id="filter-date" class="w-full bg-black/50 border border-white/10 rounded-xl text-sm text-slate-200 p-3 focus:outline-none focus:border-cyan-400 transition-all hover:border-white/20">
                                 <option value="q2">Q2 2024</option>
                                 <option value="q1">Q1 2024</option>
                                 <option value="30d">Last 30 Days</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-400 mb-1">Viewer Segment</label>
-                            <select id="filter-segment" class="w-full bg-black/50 border border-white/10 rounded-lg text-xs text-slate-200 p-2 focus:outline-none focus:border-cyan-400 transition-all hover:border-white/20">
+                            <label class="block text-[11px] font-medium text-slate-400 mb-2 px-1">Viewer Segment</label>
+                            <select id="filter-segment" class="w-full bg-black/50 border border-white/10 rounded-xl text-sm text-slate-200 p-3 focus:outline-none focus:border-cyan-400 transition-all hover:border-white/20">
                                 <option value="all">All Segments</option>
                                 <option value="high">High-Value Subs</option>
                                 <option value="casual">Casual Scrollers</option>
@@ -108,14 +108,14 @@
                 </div>
             </div>
 
-            <div class="p-4 border-t border-white/5 bg-black/40 flex items-center gap-3 backdrop-blur-md">
-                <img id="user-avatar" src="" alt="" class="w-9 h-9 rounded-full bg-indigo-500/30 border border-indigo-400/50 shadow-[0_0_10px_rgba(99,102,241,0.3)]">
+            <div class="p-6 border-t border-white/5 bg-black/40 flex items-center gap-4 backdrop-blur-md">
+                <img id="user-avatar" src="" alt="" class="w-10 h-10 rounded-full bg-indigo-500/30 border border-indigo-400/50 shadow-[0_0_12px_rgba(99,102,241,0.3)] shrink-0">
                 <div class="flex-1 min-w-0">
-                    <div id="user-name" class="text-sm font-medium text-white truncate drop-shadow-sm"></div>
-                    <div class="text-[10px] text-emerald-400 font-mono truncate uppercase tracking-wider">Role: Analyst</div>
+                    <div id="user-name" class="text-sm font-semibold text-white truncate drop-shadow-sm"></div>
+                    <div class="text-[10px] text-emerald-400 font-mono truncate uppercase tracking-widest mt-0.5">Role: Analyst</div>
                 </div>
-                <button id="btn-logout" class="p-2 bg-white/5 hover:bg-white/10 hover:text-white border border-white/10 rounded-lg transition-all text-slate-400" title="Logout">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                <button id="btn-logout" class="p-2.5 bg-white/5 hover:bg-white/10 hover:text-white border border-white/10 rounded-xl transition-all text-slate-400 hover:shadow-lg shrink-0" title="Logout">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                 </button>
             </div>
         </aside>
@@ -123,142 +123,146 @@
         <!-- MAIN AREA -->
         <main class="flex-1 flex flex-col bg-transparent relative z-0 h-full overflow-hidden">
             <!-- Header -->
-            <header class="h-16 shrink-0 border-b border-white/5 glass-panel flex items-center justify-between px-6 z-20 shadow-sm">
-                <div class="flex items-center gap-4">
-                    <div id="header-status-container" class="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 transition-all duration-300">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse"></span>
+            <header class="h-20 shrink-0 border-b border-white/5 glass-panel flex items-center justify-between px-8 z-30 shadow-sm">
+                <div class="flex items-center gap-5">
+                    <div id="header-status-container" class="px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full text-[11px] font-bold uppercase tracking-widest flex items-center gap-2.5 transition-all duration-300">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse"></span>
                         <span id="header-status">Live Pipeline</span>
                     </div>
-                    <button id="btn-toggle-view" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 hover:shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+                    <button id="btn-toggle-view" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-full text-[11px] font-bold uppercase tracking-widest transition-all flex items-center gap-2.5 hover:shadow-[0_0_12px_rgba(255,255,255,0.1)]">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
                         <span id="toggle-view-text">Full Canvas</span>
                     </button>
                 </div>
 
                 <!-- Telemetry Chips -->
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center gap-2 bg-black/40 border border-white/5 rounded-full px-3 py-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_6px_rgba(6,182,212,0.8)]"></span>
-                        <span id="header-cpu" class="text-[10px] font-mono text-cyan-200 uppercase tracking-widest font-semibold">Compute: --</span>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2.5 bg-black/40 border border-white/5 rounded-full px-4 py-2">
+                        <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
+                        <span id="header-cpu" class="text-[11px] font-mono text-cyan-200 uppercase tracking-widest font-semibold">Compute: --</span>
                     </div>
-                    <div class="flex items-center gap-2 bg-black/40 border border-white/5 rounded-full px-3 py-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse shadow-[0_0_6px_rgba(168,85,247,0.8)]"></span>
-                        <span id="header-ram" class="text-[10px] font-mono text-purple-200 uppercase tracking-widest font-semibold">Mem: --</span>
+                    <div class="flex items-center gap-2.5 bg-black/40 border border-white/5 rounded-full px-4 py-2">
+                        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span>
+                        <span id="header-ram" class="text-[11px] font-mono text-purple-200 uppercase tracking-widest font-semibold">Mem: --</span>
                     </div>
                 </div>
             </header>
 
             <!-- Scrollable Main Content -->
-            <div class="flex-1 overflow-y-auto custom-scrollbar relative p-6">
+            <div class="flex-1 overflow-y-auto custom-scrollbar relative p-8 xl:p-10">
 
                 <!-- Background decoration -->
-                <div class="absolute top-0 right-1/4 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen"></div>
-                <div class="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen"></div>
+                <div class="absolute top-0 right-1/4 w-[700px] h-[700px] bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none mix-blend-screen z-0"></div>
+                <div class="absolute bottom-0 left-1/4 w-[700px] h-[700px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none mix-blend-screen z-0"></div>
 
-                <!-- Dashboard Charts Area (Multi-Chart Expansion) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6 relative z-10">
+                <div class="max-w-[1400px] mx-auto space-y-10 relative z-10">
 
-                    <!-- Retention Trends -->
-                    <div id="chart-container-retention" class="chart-panel glass-panel lg:col-span-1 border border-white/10 rounded-2xl p-5 flex flex-col relative overflow-hidden h-64">
-                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl mix-blend-screen"></div>
-                        <h4 class="text-[10px] font-bold text-cyan-100 uppercase tracking-widest mb-3 z-10 drop-shadow-sm flex items-center gap-2">
-                            <svg class="w-3 h-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                            Retention Trends
-                        </h4>
-                        <div class="flex-1 relative z-10 min-h-0">
-                            <canvas id="trendChart"></canvas>
-                        </div>
-                    </div>
+                    <!-- Dashboard Charts Area (Multi-Chart Expansion) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                    <!-- Revenue Breakdown -->
-                    <div id="chart-container-revenue" class="chart-panel glass-panel lg:col-span-1 border border-white/10 rounded-2xl p-5 flex flex-col relative overflow-hidden h-64">
-                        <div class="absolute -top-10 -left-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl mix-blend-screen"></div>
-                        <h4 class="text-[10px] font-bold text-emerald-100 uppercase tracking-widest mb-3 z-10 drop-shadow-sm flex items-center gap-2">
-                            <svg class="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Revenue Breakdown
-                        </h4>
-                        <div class="flex-1 relative z-10 min-h-0">
-                            <canvas id="revenueChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Audience Traffic Doughnut -->
-                    <div id="chart-container-traffic" class="chart-panel glass-panel lg:col-span-1 border border-white/10 rounded-2xl p-5 flex flex-col relative overflow-hidden h-64">
-                        <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl mix-blend-screen"></div>
-                        <h4 class="text-[10px] font-bold text-purple-100 uppercase tracking-widest mb-3 z-10 drop-shadow-sm flex items-center gap-2 w-full">
-                            <svg class="w-3 h-3 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
-                            Traffic Distribution
-                        </h4>
-                        <div class="w-full h-full relative z-10 flex items-center justify-center p-2">
-                            <canvas id="trafficChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Isolated Data Preview Grid -->
-                <div class="mb-6 glass-panel border border-white/10 rounded-2xl p-6 relative overflow-hidden z-10 hidden" id="data-grid-container">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-emerald-500"></div>
-                    <div class="flex items-center justify-between mb-5">
-                        <h4 class="text-[11px] font-bold text-slate-200 uppercase tracking-widest flex items-center gap-2 drop-shadow-sm">
-                            <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                            Isolated Data Preview Grid
-                        </h4>
-                        <button id="btn-export-csv" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-300 hover:text-cyan-200 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
-                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            Export CSV
-                        </button>
-                    </div>
-                    <div class="overflow-x-auto custom-scrollbar rounded-xl border border-white/5 bg-black/40 shadow-inner">
-                        <table class="w-full text-left text-sm text-slate-300">
-                            <thead class="text-[10px] font-bold uppercase tracking-widest bg-black/60 text-slate-400 border-b border-white/5">
-                                <tr>
-                                    <th class="px-5 py-4 sortable-header" data-sort="User_ID">User_ID</th>
-                                    <th class="px-5 py-4 sortable-header" data-sort="Platform">Platform</th>
-                                    <th class="px-5 py-4 sortable-header" data-sort="Retention_Rate">Retention_Rate</th>
-                                    <th class="px-5 py-4 text-right sortable-header" data-sort="Revenue">Revenue ($)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="data-grid-body" class="divide-y divide-white/5">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Chat / Logs History -->
-                <div id="chat-history" class="space-y-6 relative z-10 pb-4">
-                    <div class="chat-message agent-message relative">
-                        <div class="flex gap-5 max-w-5xl mx-auto">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.4)] border border-white/10">
-                                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        <!-- Retention Trends -->
+                        <div id="chart-container-retention" class="chart-panel glass-panel lg:col-span-1 border border-white/10 rounded-3xl p-6 flex flex-col relative overflow-hidden min-h-[320px]">
+                            <div class="absolute -top-12 -right-12 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl mix-blend-screen pointer-events-none"></div>
+                            <h4 class="text-xs font-bold text-cyan-100 uppercase tracking-widest mb-4 z-10 drop-shadow-sm flex items-center gap-2.5">
+                                <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                                Retention Trends
+                            </h4>
+                            <div class="flex-1 relative z-10 min-h-[220px] w-full">
+                                <canvas id="trendChart"></canvas>
                             </div>
-                            <div class="flex-1 text-slate-300 text-[13px] leading-relaxed glass-panel p-4 rounded-2xl rounded-tl-sm border border-white/5 shadow-md">
-                                <strong class="text-white block mb-1 font-mono tracking-tight text-sm">DataAgent_Hub::Ready()</strong>
-                                <p class="opacity-90">Welcome to the advanced analytics suite. Filter datastreams globally, upload a local `.csv`/`.db` dataset for grid parsing, or issue a natural language prompt to compute metrics across dimensions (e.g. <em>"Show me revenue breakdown"</em>).</p>
+                        </div>
+
+                        <!-- Revenue Breakdown -->
+                        <div id="chart-container-revenue" class="chart-panel glass-panel lg:col-span-1 border border-white/10 rounded-3xl p-6 flex flex-col relative overflow-hidden min-h-[320px]">
+                            <div class="absolute -top-12 -left-12 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl mix-blend-screen pointer-events-none"></div>
+                            <h4 class="text-xs font-bold text-emerald-100 uppercase tracking-widest mb-4 z-10 drop-shadow-sm flex items-center gap-2.5">
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Revenue Breakdown
+                            </h4>
+                            <div class="flex-1 relative z-10 min-h-[220px] w-full">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Audience Traffic Doughnut -->
+                        <div id="chart-container-traffic" class="chart-panel glass-panel lg:col-span-1 border border-white/10 rounded-3xl p-6 flex flex-col relative overflow-hidden min-h-[320px]">
+                            <div class="absolute -bottom-12 -right-12 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl mix-blend-screen pointer-events-none"></div>
+                            <h4 class="text-xs font-bold text-purple-100 uppercase tracking-widest mb-4 z-10 drop-shadow-sm flex items-center gap-2.5 w-full">
+                                <svg class="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                                Traffic Distribution
+                            </h4>
+                            <div class="flex-1 relative z-10 flex items-center justify-center min-h-[220px] w-full p-2">
+                                <canvas id="trafficChart"></canvas>
                             </div>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Isolated Data Preview Grid -->
+                    <div class="glass-panel border border-white/10 rounded-3xl p-8 relative overflow-hidden hidden" id="data-grid-container">
+                        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-emerald-500"></div>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                            <h4 class="text-xs font-bold text-slate-200 uppercase tracking-widest flex items-center gap-2.5 drop-shadow-sm">
+                                <svg class="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                                Isolated Data Preview
+                            </h4>
+                            <button id="btn-export-csv" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-300 hover:text-cyan-200 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2.5 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                Export CSV
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto overflow-y-auto max-h-[300px] custom-scrollbar rounded-2xl border border-white/5 bg-black/40 shadow-inner">
+                            <table class="w-full text-left text-sm text-slate-300">
+                                <thead class="text-[11px] font-bold uppercase tracking-widest bg-black/60 text-slate-400 border-b border-white/5 sticky top-0 z-10">
+                                    <tr>
+                                        <th class="px-6 py-5 sortable-header transition-colors" data-sort="User_ID">User_ID</th>
+                                        <th class="px-6 py-5 sortable-header transition-colors" data-sort="Platform">Platform</th>
+                                        <th class="px-6 py-5 sortable-header transition-colors" data-sort="Retention_Rate">Retention_Rate</th>
+                                        <th class="px-6 py-5 text-right sortable-header transition-colors" data-sort="Revenue">Revenue ($)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data-grid-body" class="divide-y divide-white/5">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Chat / Logs History -->
+                    <div id="chat-history" class="space-y-8 pb-4">
+                        <div class="chat-message agent-message relative">
+                            <div class="flex gap-6 max-w-[1200px] mx-auto">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(99,102,241,0.5)] border border-white/10">
+                                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                </div>
+                                <div class="flex-1 text-slate-300 text-sm leading-relaxed glass-panel p-6 rounded-3xl rounded-tl-md border border-white/5 shadow-xl">
+                                    <strong class="text-white block mb-2 font-mono tracking-tight text-[15px]">DataAgent_Hub::Ready()</strong>
+                                    <p class="opacity-90 leading-loose">Welcome to the advanced analytics suite. Filter datastreams globally, upload a local `.csv`/`.db` dataset for grid parsing, or issue a natural language prompt to compute metrics across dimensions (e.g. <em>"Show me revenue breakdown"</em>).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- End max-w wrapper -->
 
                 <!-- Bottom spacing for the absolute input -->
-                <div class="h-32"></div>
+                <div class="h-10"></div>
             </div>
 
             <!-- Input Area -->
-            <div class="absolute bottom-0 left-0 right-0 p-6 pt-16 bg-gradient-to-t from-black via-black/90 to-transparent z-20 pointer-events-none">
-                <div class="max-w-4xl mx-auto relative group pointer-events-auto">
+            <div class="sticky bottom-0 left-0 right-0 p-8 pt-10 bg-gradient-to-t from-black via-black/95 to-transparent z-30 pointer-events-none shrink-0 border-t border-white/5">
+                <div class="max-w-[1200px] mx-auto relative group pointer-events-auto">
                     <!-- Glow effect behind input -->
-                    <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-emerald-500 rounded-2xl blur-md opacity-20 group-focus-within:opacity-50 transition duration-700"></div>
+                    <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-emerald-500 rounded-3xl blur-lg opacity-25 group-focus-within:opacity-60 transition duration-700"></div>
 
-                    <div class="relative glass-panel border border-white/20 rounded-2xl flex items-end p-2.5 shadow-2xl">
-                        <textarea id="chat-input" rows="1" class="w-full bg-transparent border-0 text-slate-100 placeholder-slate-500 text-sm px-4 py-3 focus:ring-0 resize-none max-h-48 overflow-y-auto custom-scrollbar font-sans" placeholder="Compute query (e.g., 'Analyze Q2 creator retention logs...')..."></textarea>
+                    <div class="relative glass-panel border border-white/20 rounded-3xl flex items-end p-3 shadow-2xl bg-black/60">
+                        <textarea id="chat-input" rows="1" class="w-full bg-transparent border-0 text-slate-100 placeholder-slate-500 text-[15px] px-5 py-4 focus:ring-0 resize-none max-h-48 overflow-y-auto custom-scrollbar font-sans leading-relaxed" placeholder="Compute query (e.g., 'Analyze Q2 creator retention logs...')..."></textarea>
 
-                        <button id="btn-send-chat" class="w-11 h-11 mb-0.5 ml-2 mr-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-cyan-400 transition-all flex-shrink-0 group-focus-within:bg-gradient-to-r group-focus-within:from-cyan-500 group-focus-within:to-blue-500 group-focus-within:text-white group-focus-within:border-transparent group-focus-within:shadow-[0_0_15px_rgba(6,182,212,0.6)]">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        <button id="btn-send-chat" class="w-12 h-12 mb-1.5 ml-3 mr-1.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-cyan-400 transition-all flex-shrink-0 group-focus-within:bg-gradient-to-r group-focus-within:from-cyan-500 group-focus-within:to-blue-500 group-focus-within:text-white group-focus-within:border-transparent group-focus-within:shadow-[0_0_20px_rgba(6,182,212,0.6)]">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                         </button>
                     </div>
 
-                    <div class="text-center mt-3 text-[9px] font-mono text-slate-500/70 uppercase tracking-[0.2em] font-bold">
+                    <div class="text-center mt-5 text-[10px] font-mono text-slate-500/80 uppercase tracking-[0.25em] font-bold">
                         Encrypted Compute Node // AES-256
                     </div>
                 </div>

@@ -63,6 +63,10 @@
     function initCharts() {
         if(!window.Chart) return;
 
+        if (trendChart) { trendChart.destroy(); }
+        if (revenueChart) { revenueChart.destroy(); }
+        if (trafficChart) { trafficChart.destroy(); }
+
         Chart.defaults.color = 'rgba(255, 255, 255, 0.6)';
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.9)';
