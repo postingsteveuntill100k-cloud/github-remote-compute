@@ -787,7 +787,7 @@ let auth = null;
 
 async function initFirebaseAuth() {
     try {
-        const configRes = await safeFetch("/api/v1/config";
+        const configRes = await safeFetch("/api/v1/config");
         const firebaseConfig = await configRes.json();
         const app = initializeApp(firebaseConfig);
         auth = getAuth(app);
