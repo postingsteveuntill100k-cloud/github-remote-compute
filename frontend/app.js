@@ -62,6 +62,53 @@ let currentSort = { column: null, direction: 'asc' };
 let tokensUsed = 0;
 const MAX_TOKENS = 50;
 
+// ----- GLOBAL FETCH WRAPPER -----
+async function safeFetch(url, options = {}) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    options.signal = controller.signal;
+
+    try {
+        const response = await fetch(url, options);
+        clearTimeout(timeoutId);
+        if(!response.ok && response.status >= 500) {
+            showGlobalError(`Server Error (${response.status}): The backend pipeline failed to process the request.`);
+            throw new Error(`Server Error (${response.status})`);
+        }
+        return response;
+    } catch (e) {
+        clearTimeout(timeoutId);
+        if (e.name === 'AbortError') {
+            showGlobalError("Network Timeout: The request exceeded the 15-second constraint.");
+            throw new Error("Timeout");
+        }
+        throw e;
+    }
+}
+
+function showGlobalError(msg) {
+    if(DOM.globalErrorModal && DOM.globalErrorMessage) {
+        DOM.globalErrorMessage.textContent = msg;
+        DOM.globalErrorModal.classList.remove("hidden");
+        setTimeout(() => {
+            DOM.globalErrorModal.classList.remove("opacity-0");
+            DOM.globalErrorModal.children[1].classList.remove("scale-95");
+            DOM.globalErrorModal.children[1].classList.add("scale-100");
+        }, 10);
+    }
+}
+
+if(DOM.btnCloseError) {
+    DOM.btnCloseError.onclick = () => {
+        if(DOM.globalErrorModal) {
+            DOM.globalErrorModal.classList.add("opacity-0");
+            DOM.globalErrorModal.children[1].classList.remove("scale-100");
+            DOM.globalErrorModal.children[1].classList.add("scale-95");
+            setTimeout(() => DOM.globalErrorModal.classList.add("hidden"), 300);
+        }
+    };
+}
+
 // ----- SETTINGS & TELEMETRY -----
 function updateUsageRing(newTokens) {
     tokensUsed += newTokens;
@@ -443,23 +490,80 @@ function renderPreviewGrid(rows) {
     DOM.dataGridContainer.classList.add("fade-in");
 }
 
+// ----- DROPZONE PHYSICS & FILE VALIDATION -----
+if(DOM.dropzoneContainer) {
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        DOM.dropzoneContainer.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        DOM.dropzoneContainer.addEventListener(eventName, () => {
+            DOM.dropzoneContainer.classList.add('border-cyan-400', 'bg-cyan-900/20', 'shadow-[0_0_15px_rgba(6,182,212,0.3)]');
+            DOM.dropzoneContainer.classList.remove('border-white/5', 'bg-black/30');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        DOM.dropzoneContainer.addEventListener(eventName, () => {
+            DOM.dropzoneContainer.classList.remove('border-cyan-400', 'bg-cyan-900/20', 'shadow-[0_0_15px_rgba(6,182,212,0.3)]');
+            DOM.dropzoneContainer.classList.add('border-white/5', 'bg-black/30');
+        }, false);
+    });
+
+    DOM.dropzoneContainer.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        if(files.length && DOM.dbFile) {
+            DOM.dbFile.files = files;
+        }
+    }
+}
+
+function validateFile(file) {
+    // 50MB ceiling
+    if(file.size > 50 * 1024 * 1024) {
+        appendChat("system", `**Error:** File size exceeds 50MB limit.`);
+        return false;
+    }
+    // Extension verification
+    const ext = file.name.split('.').pop().toLowerCase();
+    if(!['csv', 'json', 'sql', 'db', 'sqlite'].includes(ext)) {
+        appendChat("system", `**Error:** Invalid file type. Only .csv, .json, and SQL extensions are permitted.`);
+        return false;
+    }
+    return true;
+}
+
 if(DOM.btnUploadDb) {
     DOM.btnUploadDb.onclick = async () => {
         if(DOM.dbFile && !DOM.dbFile.files[0]) {
-            alert("Please select a file first.");
+            appendChat("system", `**System Notice:** Please select or drop a dataset into the zone first.`);
             return;
         }
 
-        DOM.btnUploadDb.textContent = "Uploading...";
+        const file = DOM.dbFile.files[0];
+        if(!validateFile(file)) return;
+
+        DOM.btnUploadDb.textContent = "Processing...";
+        if(DOM.uploadProgressBar) DOM.uploadProgressBar.style.width = "50%";
+
         const formData = new FormData();
-        formData.append("file", DOM.dbFile.files[0]);
+        formData.append("file", file);
 
         try {
-            const res = await fetch("/api/sandbox/upload", {
+            const res = await safeFetch("/api/sandbox/upload", {
                 method: "POST",
                 headers: { "Authorization": `Bearer ${idToken}` },
                 body: formData
             });
+            if(DOM.uploadProgressBar) DOM.uploadProgressBar.style.width = "100%";
 
             if(res.ok) {
                 const data = await res.json();
@@ -481,12 +585,17 @@ if(DOM.btnUploadDb) {
                 }
 
                 appendChat("system", `**Dataset Uploaded:** \`${DOM.dbFile.files[0].name}\` successfully ingested into the secure analytics sandbox. Sample isolated data grid populated below charts.`);
-                setTimeout(() => DOM.btnUploadDb.textContent = "Upload to Sandbox", 3000);
+                setTimeout(() => {
+                    DOM.btnUploadDb.textContent = "Upload to Sandbox";
+                    if(DOM.uploadProgressBar) DOM.uploadProgressBar.style.width = "0%";
+                    if(DOM.dbFile) DOM.dbFile.value = "";
+                }, 3000);
             } else {
                 throw new Error("Upload failed");
             }
         } catch(e) {
             DOM.btnUploadDb.textContent = "Error";
+            if(DOM.uploadProgressBar) DOM.uploadProgressBar.style.width = "0%";
             setTimeout(() => DOM.btnUploadDb.textContent = "Upload to Sandbox", 2000);
             appendChat("system", `**Error:** Failed to upload. ${e.message}`);
         }
@@ -610,7 +719,7 @@ if(DOM.btnSendChat) {
         showSkeletonLoader();
 
         try {
-            const res = await fetch("/api/sandbox/run", {
+            const res = await safeFetch("/api/sandbox/run", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
                 body: JSON.stringify({ command: text })
@@ -644,7 +753,7 @@ if(DOM.btnSendChat) {
 async function pollTelemetry() {
     if(!isSignedIn) return;
     try {
-        const res = await fetch("/api/v1/system/telemetry", { headers: { "Authorization": `Bearer ${idToken}` } });
+        const res = await safeFetch("/api/v1/system/telemetry", { headers: { "Authorization": `Bearer ${idToken}` } });
         if(res.ok) {
             const tel = await res.json();
             if(DOM.headerCpu) DOM.headerCpu.textContent = `Compute: ${tel.system_cpu_load || 0}%`;
@@ -678,7 +787,7 @@ let auth = null;
 
 async function initFirebaseAuth() {
     try {
-        const configRes = await fetch("/api/v1/config");
+        const configRes = await safeFetch("/api/v1/config";
         const firebaseConfig = await configRes.json();
         const app = initializeApp(firebaseConfig);
         auth = getAuth(app);

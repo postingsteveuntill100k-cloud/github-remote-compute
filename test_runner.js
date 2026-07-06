@@ -10,7 +10,7 @@ const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
     await recorder.start('./demo_run.mp4');
 
     try {
-        await page.goto('http://localhost:8080');
+        await page.goto('http://localhost:47831');
 
         // Wait for Firebase Auth UI
         await page.waitForSelector('#input-email');
