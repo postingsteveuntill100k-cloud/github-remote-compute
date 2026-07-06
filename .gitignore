@@ -1,0 +1,8 @@
+node_modules/
+__pycache__/
+*.pyc
+venv/
+.venv/
+.env
+auth_records.db
+HOSTING/node_modules/

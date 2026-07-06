@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.mp4
+node_modules/
+auth_records.db
+.env
